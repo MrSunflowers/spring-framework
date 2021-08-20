@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns="http://www.Sunflower.org/schema/userA"
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="http://www.Sunflower.org/schema/userA"
+			elementFormDefault="qualified"
+>
+
+	<xsd:element name="userA">
+		<xsd:complexType>
+			<xsd:attribute id="id" name="id" type="xsd:string" />
+			<xsd:attribute name="name" type="xsd:string" />
+			<xsd:attribute name="age" type="xsd:int" />
+			<xsd:attribute name="email" type="xsd:string" />
+		</xsd:complexType>
+	</xsd:element>
+
+</xsd:schema>

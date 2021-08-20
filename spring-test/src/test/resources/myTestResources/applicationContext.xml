@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:myname="http://www.Sunflower.org/schema/userA"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.Sunflower.org/schema/userA
+	   http://www.Sunflower.org/schema/userA.xsd"
+>
+
+	<!--<myname:userA id="userA" name="username" age="18" email="12345875" />-->
+	<bean name="userA" class="org.springframework.myTest.UserA"  >
+		<property name="userB" ref="userB"></property>
+	</bean>
+
+	<bean name="userB" class="org.springframework.myTest.UserB" >
+		<property name="userA" ref="userA"></property>
+	</bean>
+
+	<!--<bean id="colorFactory" class="org.springframework.myTest.factoryBeanTest.ColorFactory" >
+	</bean>
+	<bean id="car" class="org.springframework.myTest.factoryBeanTest.Car">
+		<property name="color" ref="colorFactory"></property>
+	</bean>-->
+
+
+</beans>

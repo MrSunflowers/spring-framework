@@ -203,6 +203,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 
 	/**
 	 * Determine the raw name, resolving aliases to canonical names.
+	 * 将别名解析为规范名称,例如别名 A 指向名称为 B 的 bean 则返回B，若别名A 指向别名B ，别名 B 又指向名称为 C 的 bean 则返回C 。
 	 * @param name the user-specified name
 	 * @return the transformed name
 	 */
