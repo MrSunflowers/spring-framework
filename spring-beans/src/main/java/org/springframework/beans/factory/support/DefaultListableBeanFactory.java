@@ -981,6 +981,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		if (beanDefinition instanceof AbstractBeanDefinition) {
 			try {
+				// 1.注册前的最后一次校验
 				((AbstractBeanDefinition) beanDefinition).validate();
 			}
 			catch (BeanDefinitionValidationException ex) {
@@ -990,7 +991,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 
 		BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
+		//2.对于 beanName 已经被注册的情况的处理
 		if (existingDefinition != null) {
+			//是否允许覆盖，如果设置为不允许且对应的beanName已经被覆盖则抛出异常
 			if (!isAllowBeanDefinitionOverriding()) {
 				throw new BeanDefinitionOverrideException(beanName, beanDefinition, existingDefinition);
 			}
@@ -1016,33 +1019,47 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 							"] with [" + beanDefinition + "]");
 				}
 			}
+			//直接覆盖 beanName
 			this.beanDefinitionMap.put(beanName, beanDefinition);
 		}
 		else {
+			// 3.对于 beanName 没有被注册的情况的处理
+			//	先判断当前容器是否已经处于创建阶段，即有任意bean已经被创建过，通常表示项目已经开始运行
 			if (hasBeanCreationStarted()) {
 				// Cannot modify startup-time collection elements anymore (for stable iteration)
+				// 处于创建阶段
 				synchronized (this.beanDefinitionMap) {
+					//注册 beanDefinition
 					this.beanDefinitionMap.put(beanName, beanDefinition);
+					//更新beanDefinitionNames列表
+					//不能修改启动时集合元素，读写分离
 					List<String> updatedDefinitions = new ArrayList<>(this.beanDefinitionNames.size() + 1);
 					updatedDefinitions.addAll(this.beanDefinitionNames);
 					updatedDefinitions.add(beanName);
 					this.beanDefinitionNames = updatedDefinitions;
+					//更新 manualSingletonNames 集合
 					removeManualSingletonName(beanName);
 				}
 			}
 			else {
 				// Still in startup registration phase
+				// 仍处于启动注册阶段，即没有任何bean被创建
 				this.beanDefinitionMap.put(beanName, beanDefinition);
 				this.beanDefinitionNames.add(beanName);
 				removeManualSingletonName(beanName);
 			}
 			this.frozenBeanDefinitionNames = null;
 		}
-
+		//当前注册的bean的定义已经在beanDefinitionMap缓存中存在，或者其实例已经存在于单例bean的缓存中
 		if (existingDefinition != null || containsSingleton(beanName)) {
+			//清除上一个 bean 的缓存，在替换或删除现有 bean 定义后会调用
 			resetBeanDefinition(beanName);
 		}
+		//bean是否被冻结，即不应该被进一步修改或后处理 所谓的冻结就是spring不会标识一个beanDefinition已经过期
+		//在冻结之后,你如果对一个beanDefinition更改了属性,但是spring不会觉得这个beanDefinition已经过期
+		//故而修改的不会生效
 		else if (isConfigurationFrozen()) {
+			//清除映射
 			clearByTypeCache();
 		}
 	}

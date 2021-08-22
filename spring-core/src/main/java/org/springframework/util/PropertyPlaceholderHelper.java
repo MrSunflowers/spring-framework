@@ -128,7 +128,7 @@ public class PropertyPlaceholderHelper {
 
 	protected String parseStringValue(
 			String value, PlaceholderResolver placeholderResolver, @Nullable Set<String> visitedPlaceholders) {
-
+		//查找和当前 前缀(${)相匹配 后缀(})的index,比如 ${${user}}
 		int startIndex = value.indexOf(this.placeholderPrefix);
 		if (startIndex == -1) {
 			return value;
@@ -136,6 +136,7 @@ public class PropertyPlaceholderHelper {
 
 		StringBuilder result = new StringBuilder(value);
 		while (startIndex != -1) {
+			//获取需要被替换的占位符字符串
 			int endIndex = findPlaceholderEndIndex(result, startIndex);
 			if (endIndex != -1) {
 				String placeholder = result.substring(startIndex + this.placeholderPrefix.length(), endIndex);
@@ -143,20 +144,30 @@ public class PropertyPlaceholderHelper {
 				if (visitedPlaceholders == null) {
 					visitedPlaceholders = new HashSet<>(4);
 				}
+				//避免循环依赖
 				if (!visitedPlaceholders.add(originalPlaceholder)) {
 					throw new IllegalArgumentException(
 							"Circular placeholder reference '" + originalPlaceholder + "' in property definitions");
 				}
+				// 递归调用，获取 ${} 内的内容，比如${${user}} ，第一次执行 parseStringValue
+				// 方法得到${user}，再一次执行parseStringValue 方法，得到user
 				// Recursive invocation, parsing placeholders contained in the placeholder key.
 				placeholder = parseStringValue(placeholder, placeholderResolver, visitedPlaceholders);
 				// Now obtain the value for the fully resolved key...
+				// 由上面得到的值调用 resolvePlaceholder 方法得到具体的值
 				String propVal = placeholderResolver.resolvePlaceholder(placeholder);
 				if (propVal == null && this.valueSeparator != null) {
+					//若需要解析的表达式格式为${user:zhangsan}，先解析得到 user:zhangsan
+					//通过 user:zhangsan 找不到对应的值，那么通过 : 作为分隔符
 					int separatorIndex = placeholder.indexOf(this.valueSeparator);
 					if (separatorIndex != -1) {
+						//得到第一个值：user
 						String actualPlaceholder = placeholder.substring(0, separatorIndex);
+						//得到第二个值：zhangsan
 						String defaultValue = placeholder.substring(separatorIndex + this.valueSeparator.length());
+						//先通过 第一个值：user 解析
 						propVal = placeholderResolver.resolvePlaceholder(actualPlaceholder);
+						// 如果解析不到则 使用第二个值：zhangsan 作为默认值
 						if (propVal == null) {
 							propVal = defaultValue;
 						}
@@ -165,13 +176,17 @@ public class PropertyPlaceholderHelper {
 				if (propVal != null) {
 					// Recursive invocation, parsing placeholders contained in the
 					// previously resolved placeholder value.
+					// 递归调用，继续解析可能包含的嵌套的占位符。
 					propVal = parseStringValue(propVal, placeholderResolver, visitedPlaceholders);
+					// 替换占位符
 					result.replace(startIndex, endIndex + this.placeholderSuffix.length(), propVal);
 					if (logger.isTraceEnabled()) {
 						logger.trace("Resolved placeholder '" + placeholder + "'");
 					}
+					//如果有的话，继续循环解析后面的占位符
 					startIndex = result.indexOf(this.placeholderPrefix, startIndex + propVal.length());
 				}
+				// 无法解析的情况
 				else if (this.ignoreUnresolvablePlaceholders) {
 					// Proceed with unprocessed value.
 					startIndex = result.indexOf(this.placeholderPrefix, endIndex + this.placeholderSuffix.length());

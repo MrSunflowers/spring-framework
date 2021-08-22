@@ -74,16 +74,18 @@ public class ResourceEntityResolver extends DelegatingEntityResolver {
 	@Nullable
 	public InputSource resolveEntity(@Nullable String publicId, @Nullable String systemId)
 			throws SAXException, IOException {
-
+		// 调用父类的 resolveEntity 方法构造 source 也就是 DelegatingEntityResolver.resolveEntity
 		InputSource source = super.resolveEntity(publicId, systemId);
-
+		// 若尝试父类构造失败且 systemId 不为空
 		if (source == null && systemId != null) {
 			String resourcePath = null;
 			try {
+				// 尝试解码
 				String decodedSystemId = URLDecoder.decode(systemId, "UTF-8");
 				String givenUrl = new URL(decodedSystemId).toString();
 				String systemRootUrl = new File("").toURI().toURL().toString();
 				// Try relative to resource base if currently in system root.
+				// 如果当前在系统根目录中，尝试本地解析
 				if (givenUrl.startsWith(systemRootUrl)) {
 					resourcePath = givenUrl.substring(systemRootUrl.length());
 				}
@@ -100,6 +102,7 @@ public class ResourceEntityResolver extends DelegatingEntityResolver {
 				if (logger.isTraceEnabled()) {
 					logger.trace("Trying to locate XML entity [" + systemId + "] as resource [" + resourcePath + "]");
 				}
+				// 从classPath构造InputSource
 				Resource resource = this.resourceLoader.getResource(resourcePath);
 				source = new InputSource(resource.getInputStream());
 				source.setPublicId(publicId);
@@ -110,6 +113,7 @@ public class ResourceEntityResolver extends DelegatingEntityResolver {
 			}
 			else if (systemId.endsWith(DTD_SUFFIX) || systemId.endsWith(XSD_SUFFIX)) {
 				// External dtd/xsd lookup via https even for canonical http declaration
+				// 没有可解析的本地文件，通过 https 进行外部 dtdxsd 查找，构造InputSource
 				String url = systemId;
 				if (url.startsWith("http:")) {
 					url = "https:" + url.substring(5);

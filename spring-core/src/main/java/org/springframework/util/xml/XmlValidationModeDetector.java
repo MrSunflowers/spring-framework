@@ -95,18 +95,22 @@ public class XmlValidationModeDetector {
 			String content;
 			while ((content = reader.readLine()) != null) {
 				content = consumeCommentTokens(content);
+				// 读取到空行则略过
 				if (this.inComment || !StringUtils.hasText(content)) {
 					continue;
 				}
+				// 含有DOCTYPE为DTD
 				if (hasDoctype(content)) {
 					isDtdValidated = true;
 					break;
 				}
+				// 一直读取到“<”开始符号，验证模式一定会在开始符号之前
 				if (hasOpeningTag(content)) {
 					// End of meaningful data...
 					break;
 				}
 			}
+			// 如果包含 DOCTYPE 就是 DTD 否则就是 XSD
 			return (isDtdValidated ? VALIDATION_DTD : VALIDATION_XSD);
 		}
 		catch (CharConversionException ex) {
