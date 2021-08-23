@@ -31,7 +31,6 @@ public class Main {
 		if(color instanceof Blue){
 			System.out.println("Blue");
 		}*/
-
 		UserA userA = (UserA)beanFactory.getBean("userA");
 		UserB userB = (UserB)beanFactory.getBean("userB");
 		System.out.println(userA.getUserB().equals(userB));

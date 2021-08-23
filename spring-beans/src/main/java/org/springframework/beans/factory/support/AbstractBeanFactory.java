@@ -1554,10 +1554,19 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			throws CannotLoadBeanClassException {
 
 		try {
+			// 1.如果 BeanDefinition 指定了bean class,就直接返回该bean class
 			if (mbd.hasBeanClass()) {
 				return mbd.getBeanClass();
 			}
 			if (System.getSecurityManager() != null) {
+				// 来自不同的位置的代码可以由一个CodeSource对象描述其位置和签名证书。
+				// 根据代码的CodeSource的不同，代码拥有不同的权限。例如所有Java SDK自带的代码都具有所有的权限。
+				// 用户编写的代码可以自己定制权限（通过SecurityManager）。
+				// 调用doPrivileged的方法可以不管其他方法的权限，而仅仅根据当前方法的权
+				// 限来判断用户是否能访问某个resource。也即可以规定用户只能用某种预定的方式
+				// 来访问其本来不能访问的resource。
+				//参考博客：https://www.jianshu.com/p/3fe79e24f8a1
+				//参考博客：https://www.iteye.com/blog/huangyunbin-1942509
 				return AccessController.doPrivileged((PrivilegedExceptionAction<Class<?>>)
 						() -> doResolveBeanClass(mbd, typesToMatch), getAccessControlContext());
 			}
@@ -1585,14 +1594,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		// 初始化动态类加载器为该工厂加载 bean 用的类加载器,如果该工厂有
 		// 临时类加载器时，该动态类加载器就是该工厂的临时类加载器
 		ClassLoader dynamicLoader = beanClassLoader;
-		// 表示 BeanDefinition 的配置的 bean 类名需要重新被 dynameicLoader 加载的标记，默认不需要
+		// 表示 BeanDefinition 的配置的 bean 类名需要被 dynameicLoader 加载的标记
 		boolean freshResolve = false;
 
 		if (!ObjectUtils.isEmpty(typesToMatch)) {
 			// When just doing type checks (i.e. not creating an actual instance yet),
 			// use the specified temporary class loader (e.g. in a weaving scenario).
 			// 当仅进行类型检查时（即尚未创建实际实例），使用指定的临时类加载器
-
 			// 获取该工厂的临时类加载器，该临时类加载器专门用于类型匹配
 			ClassLoader tempClassLoader = getTempClassLoader();
 			if (tempClassLoader != null) {
@@ -1612,7 +1620,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 			}
 		}
-
+		//从 BeanDefinition 中取配置的bean类名
 		String className = mbd.getBeanClassName();
 		if (className != null) {
 			// 评估 benaDefinition 中包含的 className,如果 className 是可解析表达式，
@@ -1620,7 +1628,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			Object evaluated = evaluateBeanDefinitionString(className, mbd);
 			if (!className.equals(evaluated)) {
 				// A dynamically resolved expression, supported as of 4.2...
-				// 从4.2开始支持动态解析的表达式
+				// 从 4.2 开始支持动态解析的表达式
 				if (evaluated instanceof Class) {
 					return (Class<?>) evaluated;
 				}
@@ -1635,9 +1643,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			if (freshResolve) {
 				// When resolving against a temporary class loader, exit early in order
 				// to avoid storing the resolved Class in the bean definition.
-				// 当使用临时类加载器进行解析时，请尽早退出以避免将已解析的类存储在 BeanDefinition 中
+				// 使用临时类加载器继续解析
 				if (dynamicLoader != null) {
 					try {
+						// 使用dynamicLoader加载className对应的类型，并返回加载成功的Class对象
 						return dynamicLoader.loadClass(className);
 					}
 					catch (ClassNotFoundException ex) {
@@ -1649,8 +1658,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				return ClassUtils.forName(className, dynamicLoader);
 			}
 		}
-
 		// Resolve regularly, caching the result in the BeanDefinition...
+		// 使用classLoader加载当前BeanDefinitiond对象所配置的Bean类名的Class对象
+		// 每次调用都会重新加载,可通过 AbstractBeanDefinition.getBeanClass 获取缓存
 		return mbd.resolveBeanClass(beanClassLoader);
 	}
 
@@ -1664,17 +1674,22 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	@Nullable
 	protected Object evaluateBeanDefinitionString(@Nullable String value, @Nullable BeanDefinition beanDefinition) {
+		// 如果该工厂没有设置 bean 定义值中表达式的解析策略
 		if (this.beanExpressionResolver == null) {
+			//直接返回要检查的值
 			return value;
 		}
 
 		Scope scope = null;
 		if (beanDefinition != null) {
+			//获取值所来自的bean定义的当前目标作用域
 			String scopeName = beanDefinition.getScope();
 			if (scopeName != null) {
 				scope = getRegisteredScope(scopeName);
 			}
 		}
+		//使用解析器解析
+		//如果适用，将给定值计算为表达式； 否则按原样返回值
 		return this.beanExpressionResolver.evaluate(value, new BeanExpressionContext(this, scope));
 	}
 

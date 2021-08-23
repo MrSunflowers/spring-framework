@@ -170,6 +170,14 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 			if (System.getSecurityManager() != null) {
 				AccessControlContext acc = getAccessControlContext();
 				try {
+					// 来自不同的位置的代码可以由一个CodeSource对象描述其位置和签名证书。
+					// 根据代码的CodeSource的不同，代码拥有不同的权限。例如所有Java SDK自带的代码都具有所有的权限。
+					// 用户编写的代码可以自己定制权限（通过SecurityManager）。
+					// 调用doPrivileged的方法可以不管其他方法的权限，而仅仅根据当前方法的权
+					// 限来判断用户是否能访问某个resource。也即可以规定用户只能用某种预定的方式
+					// 来访问其本来不能访问的resource。
+					//参考博客：https://www.jianshu.com/p/3fe79e24f8a1
+					//参考博客：https://www.iteye.com/blog/huangyunbin-1942509
 					object = AccessController.doPrivileged((PrivilegedExceptionAction<Object>) factory::getObject, acc);
 				}
 				catch (PrivilegedActionException pae) {

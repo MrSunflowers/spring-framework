@@ -1169,7 +1169,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 					"' on class [" + getBeanClassName() + "]");
 		}
 		else if (count == 1) {
-			// methodOverrides 对应方法唯一确定，不需要通过检测方法参数来确定方法，默认为true
+			// methodOverrides 对应的方法唯一确定，不需要再通过检测方法参数来确定方法，设定为false，默认为true
 			// Mark override as not overloaded, to avoid the overhead of arg type checking.
 			mo.setOverloaded(false);
 		}
