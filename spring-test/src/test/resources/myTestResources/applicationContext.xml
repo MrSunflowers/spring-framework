@@ -17,6 +17,10 @@
 		<property name="userA" ref="userA"></property>
 	</bean>
 
+	<bean name="user" class="org.springframework.myTest.User" init-method="init">
+		<constructor-arg name="name" value="jjj"></constructor-arg>
+	</bean>
+
 	<!--<bean id="colorFactory" class="org.springframework.myTest.factoryBeanTest.ColorFactory" >
 	</bean>
 	<bean id="car" class="org.springframework.myTest.factoryBeanTest.Car">

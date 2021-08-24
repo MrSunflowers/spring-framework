@@ -1,6 +1,8 @@
 package org.springframework.myTest;
 
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
@@ -20,7 +22,7 @@ import org.springframework.myTest.factoryBeanTest.Red;
 public class Main {
 	public static void main(String[] args) {
 		Resource resource = new ClassPathResource("myTestResources/applicationContext.xml");
-		BeanFactory beanFactory = new XmlBeanFactory(resource);
+		XmlBeanFactory beanFactory = new XmlBeanFactory(resource);
 		/*Car car = (Car) beanFactory.getBean("car");
 
 
@@ -35,5 +37,14 @@ public class Main {
 		UserB userB = (UserB)beanFactory.getBean("userB");
 		System.out.println(userA.getUserB().equals(userB));
 		System.out.println(userB.getUserA().equals(userA));
+		GenericBeanDefinition genericBeanDefinition = (GenericBeanDefinition) beanFactory.getBeanDefinition("user");
+		genericBeanDefinition.setInstanceSupplier(Main::getUser);
+		User user = (User)beanFactory.getBean("user");
+		System.out.println(user.getName());
+		//beanFactory.registerBeanDefinition();
 	}
+	public static User getUser(){
+		return new User("zhangsan");
+	}
+
 }

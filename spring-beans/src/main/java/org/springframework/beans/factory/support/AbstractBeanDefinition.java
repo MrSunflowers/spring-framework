@@ -62,7 +62,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	/**
 	 * Constant for the default scope name: {@code ""}, equivalent to singleton
 	 * status unless overridden from a parent bean definition (if applicable).
-	 * 指示 bean 的作用范围，对应 bean 的 scope 属性
+	 * <br>指示 bean 的作用范围，对应 bean 的 scope 属性
 	 */
 	public static final String SCOPE_DEFAULT = "";
 
@@ -142,80 +142,112 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private volatile Object beanClass;
 
+	//指示 bean 的作用范围，对应 bean 的 scope 属性
 	@Nullable
 	private String scope = SCOPE_DEFAULT;
+
 	//是否抽象，对应 bean 属性的 abstract
 	private boolean abstractFlag = false;
+
 	//是否延迟加载，对应 bean 属性的 lazy-init
 	@Nullable
 	private Boolean lazyInit;
+
 	//自动注入的模式，对应 bean 属性的 autowire
 	private int autowireMode = AUTOWIRE_NO;
+
 	//依赖检查
 	private int dependencyCheck = DEPENDENCY_CHECK_NONE;
+
 	//表示 bean 的实例化需要依靠另一个 bean 先实例化，对应属性 depends-on
 	@Nullable
 	private String[] dependsOn;
-	//是否作为候选者，也就是说在容器查找自动装配的对象时，
-	//将不考虑该 bean ，但其本身还是可以使用自动装配来注入其他bean，
-	//对应 autowire-candidate
+	/**
+	 * 是否作为候选者，也就是说在容器查找自动装配的对象时， <br>
+	 * 将不考虑该 bean ，但其本身还是可以使用自动装配来注入其他bean， <br>
+	 * 对应 autowire-candidate
+	 */
 	private boolean autowireCandidate = true;
+
 	//当作为自动装配的候选者时，是否作为首选
 	private boolean primary = false;
+
 	//用于记录 Qualifier
 	private final Map<String, AutowireCandidateQualifier> qualifiers = new LinkedHashMap<>();
 
+	/**
+	 * 替代工厂方法（包含静态工厂）或者构造器创建对象，但是其后面的生命周期回调不影响。 <br>
+	 * 框架在创建对象的时候会校验这个 instanceSupplier 是否有值，有的话，调用这个字段获取对象。 <br>
+	 * 不管是静态工厂还是工厂方法，都需要通过反射调用目标方法创建对象，反射或多或少影响性能。 <br>
+	 * 从 java 8 开始支持函数式接口编程，可以提供一个回调方法，直接调用回调方法即可获取对象，不需要通过反射。
+	 */
 	@Nullable
 	private Supplier<?> instanceSupplier;
+
 	//允许访问非公开的构造器和方法
 	private boolean nonPublicAccessAllowed = true;
+
 	/**
-	 是否以一种宽松的模式解析构造函数，默认为true
-	 如果为 false 则在下面情况下
-	 interface ITest{}
-	 class ITestImpl implements ITest{};
-	 class Main{
-	 Main(ITest i){}
-	 Main(ITestImpl i){}
-	 }
+	 是否以一种宽松的模式解析构造函数，默认为true <br>
+	 如果为 false 则在下面情况下 <br>
+	 interface ITest{}  <br>
+	 class ITestImpl implements ITest{};  <br>
+	 class Main{  <br>
+	 Main(ITest i){}  <br>
+	 Main(ITestImpl i){}  <br>
+	 }  <br>
 	 抛出异常，因为 Spring 无法准确定位哪个构造函数
 	 */
 	private boolean lenientConstructorResolution = true;
+
 	//对应 bean 属性 factory-bean
 	@Nullable
 	private String factoryBeanName;
+
 	//对应 bean 属性 factory-method
 	@Nullable
 	private String factoryMethodName;
+
 	//用于存储构造函数注入属性，对应 bean 的 constructor-arg
 	@Nullable
 	private ConstructorArgumentValues constructorArgumentValues;
+
 	//用于存储普通属性
 	@Nullable
 	private MutablePropertyValues propertyValues;
+
 	//存储重写方法，记录 lookup-method、replaced-method 元素
 	private MethodOverrides methodOverrides = new MethodOverrides();
+
 	//对应 bean 属性 init-method
 	@Nullable
 	private String initMethodName;
+
 	//对应 bean 属性 destroy-method
 	@Nullable
 	private String destroyMethodName;
+
 	//是否执行 init-method
 	private boolean enforceInitMethod = true;
+
 	//是否执行 destroy-method
 	private boolean enforceDestroyMethod = true;
+
 	//是否是用户定义的而不是应用程程序本身定义的，创建 AOP 时为 true
 	private boolean synthetic = false;
-	//定义 bean 的作用域，
-	// APPLICATION：用户
-	// INFRASTRUCTURE：内部使用，与用户无关
-	// SUPPORT 某些复杂配置的一部分
+
+	/**
+	 * 定义 bean 的作用域  <br>
+	 * APPLICATION：用户  <br>
+	 * INFRASTRUCTURE：内部使用，与用户无关  <br>
+	 * SUPPORT 某些复杂配置的一部分
+	 */
 	private int role = BeanDefinition.ROLE_APPLICATION;
+
 	//bean 的描述信息
 	@Nullable
 	private String description;
-	//bean 定义资源
+
 	@Nullable
 	private Resource resource;
 
