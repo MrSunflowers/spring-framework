@@ -64,6 +64,8 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	/**
 	 * Constant that indicates no externally defined autowiring. Note that
 	 * BeanFactoryAware etc and annotation-driven injection will still be applied.
+	 * <br>
+	 * 无需自动装配
 	 * @see #createBean
 	 * @see #autowire
 	 * @see #autowireBeanProperties
@@ -73,6 +75,8 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	/**
 	 * Constant that indicates autowiring bean properties by name
 	 * (applying to all bean property setters).
+	 * <br>
+	 * 按名称自动装配bean属性
 	 * @see #createBean
 	 * @see #autowire
 	 * @see #autowireBeanProperties
@@ -82,6 +86,8 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	/**
 	 * Constant that indicates autowiring bean properties by type
 	 * (applying to all bean property setters).
+	 * <br>
+	 * 按类型自动装配bean属性
 	 * @see #createBean
 	 * @see #autowire
 	 * @see #autowireBeanProperties
@@ -91,6 +97,8 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	/**
 	 * Constant that indicates autowiring the greediest constructor that
 	 * can be satisfied (involves resolving the appropriate constructor).
+	 * <br>
+	 * 按构造器自动装配
 	 * @see #createBean
 	 * @see #autowire
 	 */
@@ -99,6 +107,10 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	/**
 	 * Constant that indicates determining an appropriate autowire strategy
 	 * through introspection of the bean class.
+	 * <br>
+	 * 过时方法，Spring3.0之后不再支持
+	 * <br>
+	 * 首先会尝试使用constructor进行自动装配，如果失败再尝试使用byType
 	 * @see #createBean
 	 * @see #autowire
 	 * @deprecated as of Spring 3.0: If you are using mixed autowiring strategies,

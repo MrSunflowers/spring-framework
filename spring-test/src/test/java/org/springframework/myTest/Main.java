@@ -1,12 +1,14 @@
 package org.springframework.myTest;
 
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.myTest.CreateBeanTest.CreateBeanTestBean;
 import org.springframework.myTest.factoryBeanTest.Blue;
 import org.springframework.myTest.factoryBeanTest.Car;
 import org.springframework.myTest.factoryBeanTest.Color;
@@ -23,28 +25,50 @@ public class Main {
 	public static void main(String[] args) {
 		Resource resource = new ClassPathResource("myTestResources/applicationContext.xml");
 		XmlBeanFactory beanFactory = new XmlBeanFactory(resource);
-		/*Car car = (Car) beanFactory.getBean("car");
+		//FactoryBeanTest(beanFactory);
+		//循环依赖
+		//earlySingletonTest(beanFactory);
+		CreateBeanTest(beanFactory);
 
+	}
 
+	private static void CreateBeanTest(XmlBeanFactory beanFactory) {
+		CreateBeanTestBean createBeanTestBean = (CreateBeanTestBean) beanFactory.getBean("createBeanTestBean");
+		System.out.println(createBeanTestBean);
+	}
+
+	private static void earlySingletonTest(XmlBeanFactory beanFactory) {
+		UserA userA = (UserA)beanFactory.getBean("userA");
+		UserB userB = (UserB)beanFactory.getBean("userB");
+		System.out.println(userA.getUserB().equals(userB));
+		System.out.println(userB.getUserA().equals(userA));
+		//InstanceSupplierTest(beanFactory);
+
+	}
+
+	private static void InstanceSupplierTest(XmlBeanFactory beanFactory) {
+		GenericBeanDefinition genericBeanDefinition = (GenericBeanDefinition) beanFactory.getBeanDefinition("user");
+		genericBeanDefinition.setInstanceSupplier(Main::getUser);
+		User user = (User)beanFactory.getBean("user");
+		System.out.println(user.getName());
+	}
+
+	private static void FactoryBeanTest(XmlBeanFactory beanFactory) {
+		Car car = (Car) beanFactory.getBean("car");
 		Color color = car.getColor();
 		if(color instanceof Red){
 			System.out.println("red");
 		}
 		if(color instanceof Blue){
 			System.out.println("Blue");
-		}*/
-		UserA userA = (UserA)beanFactory.getBean("userA");
-		UserB userB = (UserB)beanFactory.getBean("userB");
-		System.out.println(userA.getUserB().equals(userB));
-		System.out.println(userB.getUserA().equals(userA));
-		GenericBeanDefinition genericBeanDefinition = (GenericBeanDefinition) beanFactory.getBeanDefinition("user");
-		genericBeanDefinition.setInstanceSupplier(Main::getUser);
-		User user = (User)beanFactory.getBean("user");
-		System.out.println(user.getName());
-		//beanFactory.registerBeanDefinition();
+		}
 	}
+
+
 	public static User getUser(){
 		return new User("zhangsan");
 	}
+
+
 
 }

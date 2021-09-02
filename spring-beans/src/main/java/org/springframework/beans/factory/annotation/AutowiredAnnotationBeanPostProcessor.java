@@ -255,6 +255,16 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 	@Override
 	@Nullable
+	/*
+	  1. 获取类的所有构造方法
+	  2. 遍历构造方法
+	  　　|-> 只有一个无参构造方法, 则返回null
+	  　　|-> 只有一个有参构造方法, 则返回这个构造方法
+	  　　|-> 有多个构造方法且没有@Autowired, 此时spring则会蒙圈了, 不知道使用哪一个了. 这里的后置处理器, 翻译过来, 叫智能选择构造方法后置处理器.
+	  　　　  当选择不了的时候, 干脆返回 null
+	  　　|-> 有多个构造方法, 且在其中一个方法上标注了 @Autowired , 则会返回这个标注的构造方法
+	  　　|-> 有多个构造方法, 且在多个方法上标注了@Autowired, 则spring会抛出异常, spring会认为, 你指定了几个给我, 是不是你弄错了
+	 */
 	public Constructor<?>[] determineCandidateConstructors(Class<?> beanClass, final String beanName)
 			throws BeanCreationException {
 
@@ -301,6 +311,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 				if (candidateConstructors == null) {
 					Constructor<?>[] rawCandidates;
 					try {
+						//反射获取所有构造函数
 						rawCandidates = beanClass.getDeclaredConstructors();
 					}
 					catch (Throwable ex) {
@@ -308,18 +319,24 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 								"Resolution of declared constructors on bean Class [" + beanClass.getName() +
 								"] from ClassLoader [" + beanClass.getClassLoader() + "] failed", ex);
 					}
+					//候选构造方法
 					List<Constructor<?>> candidates = new ArrayList<>(rawCandidates.length);
 					Constructor<?> requiredConstructor = null;
 					Constructor<?> defaultConstructor = null;
+					//这个貌似是 Kotlin 上用的, 不用管它
 					Constructor<?> primaryConstructor = BeanUtils.findPrimaryConstructor(beanClass);
 					int nonSyntheticConstructors = 0;
+					//遍历这些构造函数
 					for (Constructor<?> candidate : rawCandidates) {
+						//判断构造方法是否是合成的
 						if (!candidate.isSynthetic()) {
 							nonSyntheticConstructors++;
 						}
 						else if (primaryConstructor != null) {
 							continue;
 						}
+						//查看是否有 @Autowired 注解
+						//如果有多个构造方法, 可以通过标注 @Autowired 的方式来指定使用哪个构造方法
 						MergedAnnotation<?> ann = findAutowiredAnnotation(candidate);
 						if (ann == null) {
 							Class<?> userClass = ClassUtils.getUserClass(beanClass);
@@ -334,6 +351,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 								}
 							}
 						}
+						//有 @Autowired 的情况
 						if (ann != null) {
 							if (requiredConstructor != null) {
 								throw new BeanCreationException(beanName,
@@ -353,10 +371,14 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 							}
 							candidates.add(candidate);
 						}
+						//无参构造函数的情况
 						else if (candidate.getParameterCount() == 0) {
+							//构造函数没有参数, 则设置为默认的构造函数
 							defaultConstructor = candidate;
 						}
 					}
+					//到这里, 已经循环完了所有的构造方法
+					//候选者不为空时
 					if (!candidates.isEmpty()) {
 						// Add default constructor to list of optional constructors, as fallback.
 						if (requiredConstructor == null) {
@@ -372,23 +394,29 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 						}
 						candidateConstructors = candidates.toArray(new Constructor<?>[0]);
 					}
+					//类的构造方法只有1个, 且该构造方法有多个参数
 					else if (rawCandidates.length == 1 && rawCandidates[0].getParameterCount() > 0) {
 						candidateConstructors = new Constructor<?>[] {rawCandidates[0]};
 					}
+					//这里不会进, 因为 primaryConstructor = null
 					else if (nonSyntheticConstructors == 2 && primaryConstructor != null &&
 							defaultConstructor != null && !primaryConstructor.equals(defaultConstructor)) {
 						candidateConstructors = new Constructor<?>[] {primaryConstructor, defaultConstructor};
 					}
+					//这里也不会进, 因为 primaryConstructor = null
 					else if (nonSyntheticConstructors == 1 && primaryConstructor != null) {
 						candidateConstructors = new Constructor<?>[] {primaryConstructor};
 					}
 					else {
+						//如果方法进了这里, 就是没找到合适的构造方法
+						//1. 类定义了多个构造方法, 且没有 @Autowired , 则有可能会进这里
 						candidateConstructors = new Constructor<?>[0];
 					}
 					this.candidateConstructorsCache.put(beanClass, candidateConstructors);
 				}
 			}
 		}
+		//这里如果没找到, 则会返回 null, 而不会返回空数组
 		return (candidateConstructors.length > 0 ? candidateConstructors : null);
 	}
 

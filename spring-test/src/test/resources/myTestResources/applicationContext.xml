@@ -9,7 +9,7 @@
 >
 
 	<!--<myname:userA id="userA" name="username" age="18" email="12345875" />-->
-	<bean name="userA" class="org.springframework.myTest.UserA"  >
+	<!--<bean name="userA" class="org.springframework.myTest.UserA"  >
 		<property name="userB" ref="userB"></property>
 	</bean>
 
@@ -19,13 +19,20 @@
 
 	<bean name="user" class="org.springframework.myTest.User" init-method="init">
 		<constructor-arg name="name" value="jjj"></constructor-arg>
-	</bean>
+	</bean>-->
 
 	<!--<bean id="colorFactory" class="org.springframework.myTest.factoryBeanTest.ColorFactory" >
 	</bean>
 	<bean id="car" class="org.springframework.myTest.factoryBeanTest.Car">
 		<property name="color" ref="colorFactory"></property>
 	</bean>-->
+
+	<!--CreateBeanTest-->
+	<bean id="createBeanTestBean" class="org.springframework.myTest.CreateBeanTest.CreateBeanTestBean">
+		<constructor-arg name="age" value="18"></constructor-arg>
+		<constructor-arg name="name" value="createBeanTestBean"></constructor-arg>
+	</bean>
+
 
 
 </beans>
