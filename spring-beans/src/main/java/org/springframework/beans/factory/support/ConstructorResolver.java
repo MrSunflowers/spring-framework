@@ -198,7 +198,7 @@ class ConstructorResolver {
 
 			// Need to resolve the constructor.
 			// 3. 需要解析构造函数
-			//false：没有候选的构造函数且装配方式不是按构造器自动装配
+			// false：没有候选的构造函数且装配方式不是按构造器自动装配
 			boolean autowiring = (chosenCtors != null ||
 					mbd.getResolvedAutowireMode() == AutowireCapableBeanFactory.AUTOWIRE_CONSTRUCTOR);
 			ConstructorArgumentValues resolvedValues = null;
@@ -208,7 +208,7 @@ class ConstructorResolver {
 				minNrOfArgs = explicitArgs.length;
 			}
 			else {
-				//获取配置文件中的构造函数参数
+				//获取配置文件中的构造函数参数名称
 				ConstructorArgumentValues cargs = mbd.getConstructorArgumentValues();
 				//用于存储解析后的构造函数参数的值
 				resolvedValues = new ConstructorArgumentValues();
@@ -227,8 +227,8 @@ class ConstructorResolver {
 				if (constructorToUse != null && argsToUse != null && argsToUse.length > parameterCount) {
 					// Already found greedy constructor that can be satisfied ->
 					// do not look any further, there are only less greedy constructors left.
-					// 如果已经找到选用的构造函数或者需要的参数个数小于当前的构造函数参数个数则终止，
-					// 因为已经按照参数个数降序排列
+					// 如果当前解析到的构造函数参数个数大于当前迭代的构造函数参数个数则终止，
+					// 因为集合已经按照参数个数降序排列
 					break;
 				}
 				if (parameterCount < minNrOfArgs) {
@@ -241,13 +241,17 @@ class ConstructorResolver {
 				if (resolvedValues != null) {
 					//如果有参数，则根据参数值构造对应的参数类型的参数
 					try {
+						//获取构造函数注释上的参数
 						String[] paramNames = ConstructorPropertiesChecker.evaluate(candidate, parameterCount);
 						if (paramNames == null) {
+							//获取参数名称解析器
 							ParameterNameDiscoverer pnd = this.beanFactory.getParameterNameDiscoverer();
 							if (pnd != null) {
+								//获取指定构造函数的参数名称
 								paramNames = pnd.getParameterNames(candidate);
 							}
 						}
+						//根据名称和数据类型创建参数持有者
 						argsHolder = createArgumentArray(beanName, mbd, resolvedValues, bw, paramTypes, paramNames,
 								getUserDeclaredConstructor(candidate), autowiring, candidates.length == 1);
 					}
@@ -265,15 +269,19 @@ class ConstructorResolver {
 				}
 				else {
 					// Explicit arguments given -> arguments length must match exactly.
+					// 给定的显式参数和传入参数长度必须完全匹配
 					if (parameterCount != explicitArgs.length) {
 						continue;
 					}
+					//没有构造函数参数的情况
 					argsHolder = new ArgumentsHolder(explicitArgs);
 				}
 
+				//探测是否有不确定性的构造函数的存在，例如不同构造函数的参数为父子关系
 				int typeDiffWeight = (mbd.isLenientConstructorResolution() ?
 						argsHolder.getTypeDifferenceWeight(paramTypes) : argsHolder.getAssignabilityWeight(paramTypes));
 				// Choose this constructor if it represents the closest match.
+				// 如果它代表最接近的匹配，则选择此构造函数。
 				if (typeDiffWeight < minTypeDiffWeight) {
 					constructorToUse = candidate;
 					argsHolderToUse = argsHolder;
@@ -310,6 +318,7 @@ class ConstructorResolver {
 			}
 
 			if (explicitArgs == null && argsHolderToUse != null) {
+				//将解析的构造函数加入缓存
 				argsHolderToUse.storeCache(mbd, constructorToUse);
 			}
 		}
@@ -691,12 +700,13 @@ class ConstructorResolver {
 			ConstructorArgumentValues cargs, ConstructorArgumentValues resolvedValues) {
 
 		TypeConverter customConverter = this.beanFactory.getCustomTypeConverter();
+		//如果有自定义的类型转换器，则使用自定义的类型转换器，否则使用默认的
 		TypeConverter converter = (customConverter != null ? customConverter : bw);
 		BeanDefinitionValueResolver valueResolver =
 				new BeanDefinitionValueResolver(this.beanFactory, beanName, mbd, converter);
 
 		int minNrOfArgs = cargs.getArgumentCount();
-
+		//处理有 index 属性的参数
 		for (Map.Entry<Integer, ConstructorArgumentValues.ValueHolder> entry : cargs.getIndexedArgumentValues().entrySet()) {
 			int index = entry.getKey();
 			if (index < 0) {
@@ -707,19 +717,22 @@ class ConstructorResolver {
 				minNrOfArgs = index + 1;
 			}
 			ConstructorArgumentValues.ValueHolder valueHolder = entry.getValue();
+			//返回此持有者是否已包含已转换的值 ( true )，或者该值是否仍需要转换 ( false )。
 			if (valueHolder.isConverted()) {
 				resolvedValues.addIndexedArgumentValue(index, valueHolder);
 			}
 			else {
+				//将值转换为实际类型
 				Object resolvedValue =
 						valueResolver.resolveValueIfNecessary("constructor argument", valueHolder.getValue());
 				ConstructorArgumentValues.ValueHolder resolvedValueHolder =
 						new ConstructorArgumentValues.ValueHolder(resolvedValue, valueHolder.getType(), valueHolder.getName());
 				resolvedValueHolder.setSource(valueHolder);
+				//记录转换后的值
 				resolvedValues.addIndexedArgumentValue(index, resolvedValueHolder);
 			}
 		}
-
+		// 没有index的处理
 		for (ConstructorArgumentValues.ValueHolder valueHolder : cargs.getGenericArgumentValues()) {
 			if (valueHolder.isConverted()) {
 				resolvedValues.addGenericArgumentValue(valueHolder);
@@ -730,6 +743,7 @@ class ConstructorResolver {
 				ConstructorArgumentValues.ValueHolder resolvedValueHolder = new ConstructorArgumentValues.ValueHolder(
 						resolvedValue, valueHolder.getType(), valueHolder.getName());
 				resolvedValueHolder.setSource(valueHolder);
+				//记录转换后的值
 				resolvedValues.addGenericArgumentValue(resolvedValueHolder);
 			}
 		}

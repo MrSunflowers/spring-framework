@@ -35,7 +35,7 @@ public class RuntimeBeanReference implements BeanReference {
 
 	@Nullable
 	private final Class<?> beanType;
-
+	//这是否是对父工厂中 bean 的引用
 	private final boolean toParent;
 
 	@Nullable

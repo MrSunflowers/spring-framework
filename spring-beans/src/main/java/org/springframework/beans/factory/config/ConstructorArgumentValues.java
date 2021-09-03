@@ -42,9 +42,9 @@ import org.springframework.util.ObjectUtils;
  * @see BeanDefinition#getConstructorArgumentValues
  */
 public class ConstructorArgumentValues {
-
+	//用于存储index解析到的构造函数参数
 	private final Map<Integer, ValueHolder> indexedArgumentValues = new LinkedHashMap<>();
-
+	//存储其他的构造函数参数
 	private final List<ValueHolder> genericArgumentValues = new ArrayList<>();
 
 
