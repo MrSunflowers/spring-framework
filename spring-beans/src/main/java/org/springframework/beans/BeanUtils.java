@@ -262,6 +262,8 @@ public abstract class BeanUtils {
 	 */
 	@Nullable
 	public static <T> Constructor<T> findPrimaryConstructor(Class<T> clazz) {
+		// 检测 class 是否属于 Kotlin 类型，如果是则解析返回 Kotlin 主构造函数
+		// 其他情况一律返回 null
 		Assert.notNull(clazz, "Class must not be null");
 		if (KotlinDetector.isKotlinReflectPresent() && KotlinDetector.isKotlinType(clazz)) {
 			return KotlinDelegate.findPrimaryConstructor(clazz);

@@ -269,6 +269,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 			throws BeanCreationException {
 
 		// Let's check for lookup methods here...
+		// 检测 Lookup 注解
 		if (!this.lookupMethodsChecked.contains(beanName)) {
 			if (AnnotationUtils.isCandidateClass(beanClass, Lookup.class)) {
 				try {
@@ -303,6 +304,8 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 		}
 
 		// Quick check on the concurrent map first, with minimal locking.
+		// 开始检查构造函数，
+		// 首先尝试从缓存中获取
 		Constructor<?>[] candidateConstructors = this.candidateConstructorsCache.get(beanClass);
 		if (candidateConstructors == null) {
 			// Fully synchronized resolution now...
@@ -311,7 +314,9 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 				if (candidateConstructors == null) {
 					Constructor<?>[] rawCandidates;
 					try {
-						//反射获取所有构造函数
+						// 通过反射获取所有构造函数
+						// 包括公共、受保护、默认（包）访问和私有构造函数。
+						// 返回的数组中的元素没有排序，也没有任何特定的顺序。
 						rawCandidates = beanClass.getDeclaredConstructors();
 					}
 					catch (Throwable ex) {
@@ -323,12 +328,14 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 					List<Constructor<?>> candidates = new ArrayList<>(rawCandidates.length);
 					Constructor<?> requiredConstructor = null;
 					Constructor<?> defaultConstructor = null;
-					//这个貌似是 Kotlin 上用的, 不用管它
+					// Kotlin 检测
 					Constructor<?> primaryConstructor = BeanUtils.findPrimaryConstructor(beanClass);
 					int nonSyntheticConstructors = 0;
 					//遍历这些构造函数
 					for (Constructor<?> candidate : rawCandidates) {
-						//判断构造方法是否是合成的
+						//判断构造方法是否是由编译器生成的，在源代码中没有出现的，都会被标记为 synthetic。
+						// 当然有一些例外的情况:默认的构造函数、类的初始化方法、以及枚举类中的 value和 valueOf方法
+						// 参考 https://blog.csdn.net/lijinxiong520/article/details/106663489?utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7Edefault-2.control&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7Edefault-2.control.
 						if (!candidate.isSynthetic()) {
 							nonSyntheticConstructors++;
 						}
@@ -378,9 +385,9 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 						}
 					}
 					//到这里, 已经循环完了所有的构造方法
-					//候选者不为空时
 					if (!candidates.isEmpty()) {
 						// Add default constructor to list of optional constructors, as fallback.
+						// 将默认构造函数添加到可选构造函数列表中，作为后备。
 						if (requiredConstructor == null) {
 							if (defaultConstructor != null) {
 								candidates.add(defaultConstructor);
@@ -398,12 +405,12 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 					else if (rawCandidates.length == 1 && rawCandidates[0].getParameterCount() > 0) {
 						candidateConstructors = new Constructor<?>[] {rawCandidates[0]};
 					}
-					//这里不会进, 因为 primaryConstructor = null
+					// Kotlin 处理
 					else if (nonSyntheticConstructors == 2 && primaryConstructor != null &&
 							defaultConstructor != null && !primaryConstructor.equals(defaultConstructor)) {
 						candidateConstructors = new Constructor<?>[] {primaryConstructor, defaultConstructor};
 					}
-					//这里也不会进, 因为 primaryConstructor = null
+					// Kotlin 处理
 					else if (nonSyntheticConstructors == 1 && primaryConstructor != null) {
 						candidateConstructors = new Constructor<?>[] {primaryConstructor};
 					}

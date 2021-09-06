@@ -134,7 +134,8 @@ class ConstructorResolver {
 		ArgumentsHolder argsHolderToUse = null;
 		Object[] argsToUse = null;
 		// 1. 先尝试从缓存获取
-		//如果通过 getBean 传入的 explicitArgs 参数列表不为空，那么这个参数列表就是可以直接使用的参数
+		// 如果通过 getBean 传入的 explicitArgs 参数列表不为空，
+		// 那么这个参数列表就是可以直接使用的参数
 		if (explicitArgs != null) {
 			argsToUse = explicitArgs;
 		}
@@ -143,18 +144,18 @@ class ConstructorResolver {
 			//从配置文件中解析获取
 			Object[] argsToResolve = null;
 			synchronized (mbd.constructorArgumentLock) {
+				//如果缓存中已经存在解析过的构造器
 				constructorToUse = (Constructor<?>) mbd.resolvedConstructorOrFactoryMethod;
 				if (constructorToUse != null && mbd.constructorArgumentsResolved) {
 					// Found a cached constructor...
-					// 从缓存中获取
+					// 从缓存中获取解析完成的参数列表
 					argsToUse = mbd.resolvedConstructorArguments;
 					if (argsToUse == null) {
-						// 配置函数的构造函数参数
+						//获取需要进一步解析的参数列表
 						argsToResolve = mbd.preparedConstructorArguments;
 					}
 				}
 			}
-			//缓存中存在
 			if (argsToResolve != null) {
 				// 解析参数类型，将参数配置解析成为最终值
 				// 如构造函数：A(int,int) ==> 就会把配置中的("1","1") 转化为 (1,1)
@@ -393,7 +394,8 @@ class ConstructorResolver {
 	/**
 	 * Retrieve all candidate methods for the given class, considering
 	 * the {@link RootBeanDefinition#isNonPublicAccessAllowed()} flag.
-	 * Called as the starting point for factory method determination.
+	 * Called as the starting point for factory method determination.<br>
+	 * 根据是否允许访问非公共构造函数和方法返回结果
 	 */
 	private Method[] getCandidateMethods(Class<?> factoryClass, RootBeanDefinition mbd) {
 		if (System.getSecurityManager() != null) {
@@ -434,20 +436,25 @@ class ConstructorResolver {
 
 		String factoryBeanName = mbd.getFactoryBeanName();
 		if (factoryBeanName != null) {
+			//非静态工厂的处理
 			if (factoryBeanName.equals(beanName)) {
+				// factoryBeanName 是自己本身抛出异常
 				throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName,
 						"factory-bean reference points back to the same bean definition");
 			}
+			//先获取 factoryBean 实例
 			factoryBean = this.beanFactory.getBean(factoryBeanName);
 			if (mbd.isSingleton() && this.beanFactory.containsSingleton(beanName)) {
 				throw new ImplicitlyAppearedSingletonException();
 			}
+			//为给定的 bean 注册一个依赖 bean，在 factoryBean 销毁之前销毁当前 bean
 			this.beanFactory.registerDependentBean(factoryBeanName, beanName);
 			factoryClass = factoryBean.getClass();
 			isStatic = false;
 		}
 		else {
 			// It's a static factory method on the bean class.
+			// 静态工厂的处理
 			if (!mbd.hasBeanClass()) {
 				throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName,
 						"bean definition declares neither a bean class nor a factory-bean reference");
@@ -467,26 +474,35 @@ class ConstructorResolver {
 		else {
 			Object[] argsToResolve = null;
 			synchronized (mbd.constructorArgumentLock) {
+				//如果缓存中已经存在解析过的 FactoryMethod
 				factoryMethodToUse = (Method) mbd.resolvedConstructorOrFactoryMethod;
+				//存在解析过的 FactoryMethod 且 参数已经解析过了
 				if (factoryMethodToUse != null && mbd.constructorArgumentsResolved) {
 					// Found a cached factory method...
+					// 从缓存中获取解析完成的参数列表
 					argsToUse = mbd.resolvedConstructorArguments;
 					if (argsToUse == null) {
+						//获取需要进一步解析的参数列表
 						argsToResolve = mbd.preparedConstructorArguments;
 					}
 				}
 			}
 			if (argsToResolve != null) {
+				// 解析参数类型，将参数配置解析成为最终值
+				// 如构造函数：A(int,int) ==> 就会把配置中的("1","1") 转化为 (1,1)
+				// 缓存中的值可能是原始值也可能是最终值
 				argsToUse = resolvePreparedArguments(beanName, mbd, bw, factoryMethodToUse, argsToResolve);
 			}
 		}
-
+		// 没有缓存，第一次使用
 		if (factoryMethodToUse == null || argsToUse == null) {
 			// Need to determine the factory method...
 			// Try all methods with this name to see if they match the given arguments.
+			// 现在确定工厂方法 FactoryMethod 尝试查看使用此名称的所有方法，看看它们是否与给定的参数匹配。
 			factoryClass = ClassUtils.getUserClass(factoryClass);
 
 			List<Method> candidates = null;
+			// FactoryMethod 是否有重载
 			if (mbd.isFactoryMethodUnique) {
 				if (factoryMethodToUse == null) {
 					factoryMethodToUse = mbd.getResolvedFactoryMethod();
@@ -497,7 +513,9 @@ class ConstructorResolver {
 			}
 			if (candidates == null) {
 				candidates = new ArrayList<>();
+				// 根据是否允许访问非公共构造函数和方法返回结果
 				Method[] rawCandidates = getCandidateMethods(factoryClass, mbd);
+				// 查找并记录所有与工厂方法同名的方法
 				for (Method candidate : rawCandidates) {
 					if (Modifier.isStatic(candidate.getModifiers()) == isStatic && mbd.isFactoryMethod(candidate)) {
 						candidates.add(candidate);
@@ -505,9 +523,12 @@ class ConstructorResolver {
 				}
 			}
 
+			// 当与工厂方法同名的候选方法只有一个，且调用 getBean 方法时没有传参，
+			// 且没有缓存过参数，直接通过调用实例化方法执行该候选方法
 			if (candidates.size() == 1 && explicitArgs == null && !mbd.hasConstructorArgumentValues()) {
 				Method uniqueCandidate = candidates.get(0);
 				if (uniqueCandidate.getParameterCount() == 0) {
+					//没有参数，设置缓存
 					mbd.factoryMethodToIntrospect = uniqueCandidate;
 					synchronized (mbd.constructorArgumentLock) {
 						mbd.resolvedConstructorOrFactoryMethod = uniqueCandidate;

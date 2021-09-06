@@ -22,28 +22,42 @@ import org.springframework.myTest.factoryBeanTest.Red;
  * @Date 2021/6/21
  */
 public class Main {
+	boolean isFactoryMethodUnique;
+
 	public static void main(String[] args) {
+		System.out.println(new Main().isFactoryMethodUnique);
+
 		Resource resource = new ClassPathResource("myTestResources/applicationContext.xml");
 		XmlBeanFactory beanFactory = new XmlBeanFactory(resource);
-		//FactoryBeanTest(beanFactory);
+		FactoryBeanTest(beanFactory);
 		//循环依赖
 		//earlySingletonTest(beanFactory);
-		CreateBeanTest(beanFactory);
+		//CreateBeanTest(beanFactory);
 
 	}
-
+	/**
+	 * description: 构造器测试 <br>
+	 * version: 1.0 <br>
+	 * date: 2021/9/6 15:29 <br>
+	 * author: lyk <br>
+	 */
 	private static void CreateBeanTest(XmlBeanFactory beanFactory) {
 		CreateBeanTestBean createBeanTestBean = (CreateBeanTestBean) beanFactory.getBean("createBeanTestBean");
 		System.out.println(createBeanTestBean);
 	}
 
+	/**
+	 * description: 循环依赖测试 <br>
+	 * version: 1.0 <br>
+	 * date: 2021/9/6 15:30 <br>
+	 * author: lyk <br>
+	 */
 	private static void earlySingletonTest(XmlBeanFactory beanFactory) {
 		UserA userA = (UserA)beanFactory.getBean("userA");
 		UserB userB = (UserB)beanFactory.getBean("userB");
 		System.out.println(userA.getUserB().equals(userB));
 		System.out.println(userB.getUserA().equals(userA));
 		//InstanceSupplierTest(beanFactory);
-
 	}
 
 	private static void InstanceSupplierTest(XmlBeanFactory beanFactory) {

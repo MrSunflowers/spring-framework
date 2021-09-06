@@ -7,32 +7,45 @@
 	   http://www.Sunflower.org/schema/userA
 	   http://www.Sunflower.org/schema/userA.xsd"
 >
-
+	<!-- 自定义标签 -->
 	<!--<myname:userA id="userA" name="username" age="18" email="12345875" />-->
+
+	<!--循环依赖-->
 	<!--<bean name="userA" class="org.springframework.myTest.UserA"  >
 		<property name="userB" ref="userB"></property>
 	</bean>
-
 	<bean name="userB" class="org.springframework.myTest.UserB" >
 		<property name="userA" ref="userA"></property>
 	</bean>
-
 	<bean name="user" class="org.springframework.myTest.User" init-method="init">
 		<constructor-arg name="name" value="jjj"></constructor-arg>
 	</bean>-->
 
+
+	<!--colorFactory begin-->
 	<!--<bean id="colorFactory" class="org.springframework.myTest.factoryBeanTest.ColorFactory" >
 	</bean>
 	<bean id="car" class="org.springframework.myTest.factoryBeanTest.Car">
 		<property name="color" ref="colorFactory"></property>
 	</bean>-->
+	<!--colorFactory end-->
 
-	<!--CreateBeanTest-->
-	<bean id="createBeanTestBean" class="org.springframework.myTest.CreateBeanTest.CreateBeanTestBean">
+
+	<!--ColorFactoryTest begin-->
+	<bean id="red" factory-bean="colorFactory" factory-method="getInstance"></bean>
+	<bean id="colorFactory" class="org.springframework.myTest.factoryBeanTest.ColorFactoryTest"></bean>
+	<bean id="car" class="org.springframework.myTest.factoryBeanTest.Car">
+		<property name="color" ref="red"></property>
+	</bean>
+	<!--ColorFactoryTest end-->
+
+
+	<!--构造器测试 begin-->
+	<!--<bean id="createBeanTestBean" class="org.springframework.myTest.CreateBeanTest.CreateBeanTestBean">
 		<constructor-arg name="age" value="18"></constructor-arg>
 		<constructor-arg name="name" value="createBeanTestBean"></constructor-arg>
-	</bean>
-
+	</bean>-->
+	<!--构造器测试 end-->
 
 
 </beans>
