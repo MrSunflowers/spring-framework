@@ -32,7 +32,9 @@
 
 
 	<!--ColorFactoryTest begin-->
-	<bean id="red" factory-bean="colorFactory" factory-method="getInstance"></bean>
+	<bean id="red" factory-bean="colorFactory" factory-method="getInstance">
+		<constructor-arg name="ags" value="123"></constructor-arg>
+	</bean>
 	<bean id="colorFactory" class="org.springframework.myTest.factoryBeanTest.ColorFactoryTest"></bean>
 	<bean id="car" class="org.springframework.myTest.factoryBeanTest.Car">
 		<property name="color" ref="red"></property>

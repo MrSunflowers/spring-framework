@@ -8,7 +8,8 @@ package org.springframework.myTest.factoryBeanTest;
  * @Date 2021/9/6
  */
 public class ColorFactoryTest {
-	public Color getInstance(){
+	public Color getInstance(int ags){
+		System.out.println(ags);
 		return new Blue();
 	}
 }

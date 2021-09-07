@@ -307,6 +307,7 @@ public class MethodInvoker {
 	public static int getTypeDifferenceWeight(Class<?>[] paramTypes, Object[] args) {
 		int result = 0;
 		for (int i = 0; i < paramTypes.length; i++) {
+			//参数类型是否可以转化为候选方法的参数类型
 			if (!ClassUtils.isAssignableValue(paramTypes[i], args[i])) {
 				return Integer.MAX_VALUE;
 			}
@@ -314,6 +315,7 @@ public class MethodInvoker {
 				Class<?> paramType = paramTypes[i];
 				Class<?> superClass = args[i].getClass().getSuperclass();
 				while (superClass != null) {
+					//参数类型是否为方法参数的子类
 					if (paramType.equals(superClass)) {
 						result = result + 2;
 						superClass = null;
