@@ -94,7 +94,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
 	protected Object getObjectFromFactoryBean(FactoryBean<?> factory, String beanName, boolean shouldPostProcess) {
-		// 1. 判断是否为单例
+		// 1. 如果 factory 管理的对象是单例且 该 FactoryBean 本身已经被实例化了
 		if (factory.isSingleton() && containsSingleton(beanName)) {
 			synchronized (getSingletonMutex()) {
 				// 先尝试从 factoryBean 单例缓存中获取，检查对应的 bean 是否已经加载过了
@@ -104,24 +104,28 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 					object = doGetObjectFromFactoryBean(factory, beanName);
 					// Only post-process and store if not put there already during getObject() call above
 					// (e.g. because of circular reference processing triggered by custom getBean calls)
-					// 在上面的 doGetObjectFromFactoryBean 方法中，如果存在循环引用，
-					// 会导致该方法被调用两次,此时该 beanName 已经被加入了 factoryBeanObjectCache 缓存，
-					// 可以直接返回结果，否则加入到缓存中去
-					// 另一方面,加了这个判断也可以防止 postProcessObjectFromFactoryBean 方法被调用多次。
+					// 在上面的 doGetObjectFromFactoryBean 方法调用过程中，如果存在循环引用，
+					// 可能会导致当前方法被多次调用,此时当前 beanName 已经被加入了 factoryBeanObjectCache 缓存
+					// 可以直接返回结果，另一方面,加了这个判断也可以
+					// 防止 postProcessObjectFromFactoryBean 方法被调用多次，保证
+					// object 的唯一性。
 					Object alreadyThere = this.factoryBeanObjectCache.get(beanName);
 					if (alreadyThere != null) {
 						object = alreadyThere;
 					}
 					else {
 						if (shouldPostProcess) {
+							// 需要做增强处理
 							if (isSingletonCurrentlyInCreation(beanName)) {
+								// 指定的单例 bean 当前正在创建中
 								// Temporarily return non-post-processed object, not storing it yet..
 								return object;
 							}
+							// 创建单例之前的回调方法
 							beforeSingletonCreation(beanName);
 							try {
 								// bean 加载的一个特点就是在 bean 实例化结束都尽量调用 BeanPostProcessor 里面的方法
-								// bean 实例化后处理
+								// bean 实例化后处理器
 								object = postProcessObjectFromFactoryBean(object, beanName);
 							}
 							catch (Throwable ex) {
@@ -129,6 +133,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 										"Post-processing of FactoryBean's singleton object failed", ex);
 							}
 							finally {
+								// 创建单例之后的回调方法
 								afterSingletonCreation(beanName);
 							}
 						}

@@ -157,7 +157,7 @@ class ConstructorResolver {
 				}
 			}
 			if (argsToResolve != null) {
-				// 解析参数类型，将参数配置解析成为最终值
+				// 解析缓存值
 				// 如构造函数：A(int,int) ==> 就会把配置中的("1","1") 转化为 (1,1)
 				// 缓存中的值可能是原始值也可能是最终值
 				argsToUse = resolvePreparedArguments(beanName, mbd, bw, constructorToUse, argsToResolve);
@@ -250,11 +250,11 @@ class ConstructorResolver {
 							//获取参数名称解析器
 							ParameterNameDiscoverer pnd = this.beanFactory.getParameterNameDiscoverer();
 							if (pnd != null) {
-								//获取指定构造函数的参数名称
+								//获取候选方法的参数名称列表
 								paramNames = pnd.getParameterNames(candidate);
 							}
 						}
-						//根据名称和数据类型创建参数持有者
+						//尝试根据候选函数参数类型匹配并转换解析到的参数
 						argsHolder = createArgumentArray(beanName, mbd, resolvedValues, bw, paramTypes, paramNames,
 								getUserDeclaredConstructor(candidate), autowiring, candidates.length == 1);
 					}
@@ -280,11 +280,11 @@ class ConstructorResolver {
 					argsHolder = new ArgumentsHolder(explicitArgs);
 				}
 
-				//探测是否有不确定性的构造函数的存在，例如不同构造函数的参数为父子关系
+				// 计算工厂方法的权重，分严格模式和宽松模式，数值越小权重越高
 				int typeDiffWeight = (mbd.isLenientConstructorResolution() ?
 						argsHolder.getTypeDifferenceWeight(paramTypes) : argsHolder.getAssignabilityWeight(paramTypes));
 				// Choose this constructor if it represents the closest match.
-				// 如果它代表最接近的匹配，则选择此构造函数。
+				// 当计算的值小于最大值时，记录该方法和参数，等待与遍历的下一个候选工厂方法比对比
 				if (typeDiffWeight < minTypeDiffWeight) {
 					constructorToUse = candidate;
 					argsHolderToUse = argsHolder;
@@ -292,6 +292,8 @@ class ConstructorResolver {
 					minTypeDiffWeight = typeDiffWeight;
 					ambiguousConstructors = null;
 				}
+				// 当遍历方法时，前面已经设置了 constructorToUse 且当前方法与记录的方法权重相同
+				// 则记录当前方法，继续遍历如果找到更合适的方法则清空记录
 				else if (constructorToUse != null && typeDiffWeight == minTypeDiffWeight) {
 					if (ambiguousConstructors == null) {
 						ambiguousConstructors = new LinkedHashSet<>();
@@ -300,7 +302,7 @@ class ConstructorResolver {
 					ambiguousConstructors.add(candidate);
 				}
 			}
-
+			// 没找到匹配的构造方法
 			if (constructorToUse == null) {
 				if (causes != null) {
 					UnsatisfiedDependencyException ex = causes.removeLast();
@@ -313,6 +315,7 @@ class ConstructorResolver {
 						"Could not resolve matching constructor on bean class [" + mbd.getBeanClassName() + "] " +
 						"(hint: specify index/type/name arguments for simple parameters to avoid type ambiguities)");
 			}
+			// 存在多个相同权重的方法，不知道选哪个
 			else if (ambiguousConstructors != null && !mbd.isLenientConstructorResolution()) {
 				throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 						"Ambiguous constructor matches found on bean class [" + mbd.getBeanClassName() + "] " +
@@ -327,6 +330,7 @@ class ConstructorResolver {
 		}
 
 		Assert.state(argsToUse != null, "Unresolved constructor arguments");
+		//开始实例化
 		bw.setBeanInstance(instantiate(beanName, mbd, constructorToUse, argsToUse));
 		return bw;
 	}
@@ -701,6 +705,7 @@ class ConstructorResolver {
 			}
 
 			if (explicitArgs == null && argsHolderToUse != null) {
+				//将解析的函数加入缓存
 				mbd.factoryMethodToIntrospect = factoryMethodToUse;
 				argsHolderToUse.storeCache(mbd, factoryMethodToUse);
 			}
