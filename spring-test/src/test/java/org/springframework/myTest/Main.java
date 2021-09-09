@@ -22,18 +22,11 @@ import org.springframework.myTest.factoryBeanTest.Red;
  * @Date 2021/6/21
  */
 public class Main {
-	boolean isFactoryMethodUnique;
 
 	public static void main(String[] args) {
-		System.out.println(new Main().isFactoryMethodUnique);
-
 		Resource resource = new ClassPathResource("myTestResources/applicationContext.xml");
 		XmlBeanFactory beanFactory = new XmlBeanFactory(resource);
 		FactoryBeanTest(beanFactory);
-		//循环依赖
-		//earlySingletonTest(beanFactory);
-		//CreateBeanTest(beanFactory);
-
 	}
 	/**
 	 * description: 构造器测试 <br>
@@ -57,7 +50,6 @@ public class Main {
 		UserB userB = (UserB)beanFactory.getBean("userB");
 		System.out.println(userA.getUserB().equals(userB));
 		System.out.println(userB.getUserA().equals(userA));
-		//InstanceSupplierTest(beanFactory);
 	}
 
 	private static void InstanceSupplierTest(XmlBeanFactory beanFactory) {

@@ -1193,10 +1193,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected BeanWrapper createBeanInstance(String beanName, RootBeanDefinition mbd, @Nullable Object[] args) {
 		// Make sure bean class is actually resolved at this point.
-		// 1. 先解析类名
+		// 1. 获取之前解析的类
 		Class<?> beanClass = resolveBeanClass(mbd, beanName);
-		// 权限检查，如果beanclass为空，且beanclass不是public
-		// 且没有权限访问构造函数和方法则抛出异常
+		// 权限检查，如果 beanclass 不为空，且 beanclass 不是 public 的
+		// 且没有权限访问访问非公共构造函数和方法抛出异常
 		if (beanClass != null && !Modifier.isPublic(beanClass.getModifiers()) && !mbd.isNonPublicAccessAllowed()) {
 			throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 					"Bean class isn't public, and non-public access not allowed: " + beanClass.getName());
@@ -1208,7 +1208,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// 框架在创建对象的时候会校验这个 instanceSupplier 是否有值，有的话，调用这个字段获取对象。
 		// 不管是静态工厂还是工厂方法，都需要通过反射调用目标方法创建对象，反射或多或少影响性能。
 		// 从 java 8 开始支持函数式接口编程，可以提供一个回调方法，直接调用回调方法即可获取对象，不需要通过反射。
-		// 参考 https://blog.csdn.net/duxd185120/article/details/109224025
 		Supplier<?> instanceSupplier = mbd.getInstanceSupplier();
 		if (instanceSupplier != null) {
 			return obtainFromSupplier(instanceSupplier, beanName);
@@ -1287,6 +1286,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		String outerBean = this.currentlyCreatedBean.get();
 		this.currentlyCreatedBean.set(beanName);
 		try {
+			//直接调用用户定义的回调函数
 			instance = instanceSupplier.get();
 		}
 		finally {
