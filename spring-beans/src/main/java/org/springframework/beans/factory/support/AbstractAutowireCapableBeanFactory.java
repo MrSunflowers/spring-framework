@@ -1218,9 +1218,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}
 
-		// 3.解析构造函数
+		// 3.获取缓存的构造函数
 
-		// 解析构造函数，一个 bean 可能拥有多个构造函数，每个构造函数的参数不同，调用前需要根据参数确定构造函数
+		// 获取缓存的构造函数，一个 bean 可能拥有多个构造函数，每个构造函数的参数不同，调用前需要根据参数确定构造函数
 		// 判断过程比较消耗性能，所以采用缓存机制，如果之前已经解析过了，则不需要再次解析，直接从缓存中获取即可
 		// Shortcut when re-creating the same bean...
 		boolean resolved = false;
