@@ -540,7 +540,8 @@ public abstract class ClassUtils {
 	public static boolean isAssignable(Class<?> lhsType, Class<?> rhsType) {
 		Assert.notNull(lhsType, "Left-hand side type must not be null");
 		Assert.notNull(rhsType, "Right-hand side type must not be null");
-		//参数类型是否可以转换为候选方法参数类型
+		//确定此Class对象表示的类或接口是否与指定的Class参数表示的类或接口相同，或者是其超类或超接口。
+		//如果是，则返回true否则返回false。
 		if (lhsType.isAssignableFrom(rhsType)) {
 			return true;
 		}
