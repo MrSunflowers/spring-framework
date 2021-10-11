@@ -1339,9 +1339,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			throws BeansException {
 		// 判断该 beanClass 是否存在实例化前的回调
 		if (beanClass != null && hasInstantiationAwareBeanPostProcessors()) {
-			// 遍历实例化前的回调
+			// 遍历所有的SmartInstantiationAwareBeanPostProcessor实例，
+			// 执行其determineCandidateConstructors方法
+			// （如有需要可以自定义 SmartInstantiationAwareBeanPostProcessor，按需求重写 determineCandidateConstructors 方法）
+			// 默认的 processor 为 AutowiredAnnotationBeanPostProcessor
 			for (SmartInstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().smartInstantiationAware) {
-				//SmartInstantiationAwareBeanPostProcessor.determineCandidateConstructors
 				//用于对象实例化之前执行，用来选择使用哪个构造函数
 				Constructor<?>[] ctors = bp.determineCandidateConstructors(beanClass, beanName);
 				if (ctors != null) {

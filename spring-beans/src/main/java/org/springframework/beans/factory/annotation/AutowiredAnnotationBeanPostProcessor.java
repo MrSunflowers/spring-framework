@@ -305,7 +305,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 		// Quick check on the concurrent map first, with minimal locking.
 		// 开始检查构造函数，
-		// 首先尝试从缓存中获取
+		// 如果之前已经有用构造方法实例化 bean，就会有缓存，原型模式和 scope 模式会有再次使用的时候
 		Constructor<?>[] candidateConstructors = this.candidateConstructorsCache.get(beanClass);
 		if (candidateConstructors == null) {
 			// Fully synchronized resolution now...
@@ -314,7 +314,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 				if (candidateConstructors == null) {
 					Constructor<?>[] rawCandidates;
 					try {
-						// 通过反射获取所有构造函数
+						// 缓存中不存在的时候使用 getDeclaredConstructors 方法通过反射获取所有的构造方法
 						// 包括公共、受保护、默认（包）访问和私有构造函数。
 						// 返回的数组中的元素没有排序，也没有任何特定的顺序。
 						rawCandidates = beanClass.getDeclaredConstructors();
@@ -328,12 +328,12 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 					List<Constructor<?>> candidates = new ArrayList<>(rawCandidates.length);
 					Constructor<?> requiredConstructor = null;
 					Constructor<?> defaultConstructor = null;
-					// Kotlin 检测
+					// Kotlin 检测 ，检测 class 是否属于 Kotlin 类型，如果是则解析返回 Kotlin 主构造函数 其他情况一律返回 null
 					Constructor<?> primaryConstructor = BeanUtils.findPrimaryConstructor(beanClass);
 					int nonSyntheticConstructors = 0;
 					//遍历这些构造函数
 					for (Constructor<?> candidate : rawCandidates) {
-						//判断构造方法是否是由编译器生成的，在源代码中没有出现的，都会被标记为 synthetic。
+						// 判断构造方法是否是由编译器生成的，在源代码中没有出现的，都会被标记为 synthetic。
 						// 当然有一些例外的情况:默认的构造函数、类的初始化方法、以及枚举类中的 value和 valueOf方法
 						// 参考 https://blog.csdn.net/lijinxiong520/article/details/106663489?utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7Edefault-2.control&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7Edefault-2.control.
 						if (!candidate.isSynthetic()) {
@@ -346,6 +346,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 						//如果有多个构造方法, 可以通过标注 @Autowired 的方式来指定使用哪个构造方法
 						MergedAnnotation<?> ann = findAutowiredAnnotation(candidate);
 						if (ann == null) {
+							//如果没有@Autowired注解，查找父类的构造方法有没有@Autowired注解
 							Class<?> userClass = ClassUtils.getUserClass(beanClass);
 							if (userClass != beanClass) {
 								try {
@@ -360,6 +361,9 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 						}
 						//有 @Autowired 的情况
 						if (ann != null) {
+							//当@Autowired注解的构造方法不止一个，那上一次处理的候选构造方法
+							//已经设置到requiredConstructor 中，那么第二个@Autowired注解的
+							//候选构造方法处理的时候就会抛异常
 							if (requiredConstructor != null) {
 								throw new BeanCreationException(beanName,
 										"Invalid autowire-marked constructor: " + candidate +
@@ -374,11 +378,13 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 											". Found constructor with 'required' Autowired annotation: " +
 											candidate);
 								}
+								//第一个处理的有@autowired处理的构造方法设置requiredConstructor ，并设置到candidates中
 								requiredConstructor = candidate;
 							}
 							candidates.add(candidate);
 						}
 						//无参构造函数的情况
+						//当构造方法没有@Autowired注解且参数个数为0，选为defaultConstructor
 						else if (candidate.getParameterCount() == 0) {
 							//构造函数没有参数, 则设置为默认的构造函数
 							defaultConstructor = candidate;
@@ -390,6 +396,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 						// 将默认构造函数添加到可选构造函数列表中，作为后备。
 						if (requiredConstructor == null) {
 							if (defaultConstructor != null) {
+								//往候选方法中加入defaultConstructor
 								candidates.add(defaultConstructor);
 							}
 							else if (candidates.size() == 1 && logger.isInfoEnabled()) {
@@ -399,8 +406,10 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 										"default constructor to fall back to: " + candidates.get(0));
 							}
 						}
+						//候选方法不为空的时候进入此处，此时就一个@Autowired注解的构造方法
 						candidateConstructors = candidates.toArray(new Constructor<?>[0]);
 					}
+					//当获取的所有构造方法只有一个，且不是@autowired注解的（注解的在上面处理了）
 					//类的构造方法只有1个, 且该构造方法有多个参数
 					else if (rawCandidates.length == 1 && rawCandidates[0].getParameterCount() > 0) {
 						candidateConstructors = new Constructor<?>[] {rawCandidates[0]};
@@ -419,6 +428,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 						//1. 类定义了多个构造方法, 且没有 @Autowired , 则有可能会进这里
 						candidateConstructors = new Constructor<?>[0];
 					}
+					//缓存选定的候选构造方法，供原型模式和scope模式第二次实例化时使用
 					this.candidateConstructorsCache.put(beanClass, candidateConstructors);
 				}
 			}

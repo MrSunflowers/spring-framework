@@ -309,6 +309,7 @@ public class MethodInvoker {
 		for (int i = 0; i < paramTypes.length; i++) {
 			//参数类型是否可以转化为候选方法的参数类型
 			if (!ClassUtils.isAssignableValue(paramTypes[i], args[i])) {
+				//参数无法匹配
 				return Integer.MAX_VALUE;
 			}
 			if (args[i] != null) {
