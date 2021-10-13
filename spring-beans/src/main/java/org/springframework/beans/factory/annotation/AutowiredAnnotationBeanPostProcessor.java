@@ -260,8 +260,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 	  2. 遍历构造方法
 	  　　|-> 只有一个无参构造方法, 则返回null
 	  　　|-> 只有一个有参构造方法, 则返回这个构造方法
-	  　　|-> 有多个构造方法且没有@Autowired, 此时spring则会蒙圈了, 不知道使用哪一个了. 这里的后置处理器, 翻译过来, 叫智能选择构造方法后置处理器.
-	  　　　  当选择不了的时候, 干脆返回 null
+	  　　|-> 有多个构造方法且没有@Autowired, 此时spring不知道使用哪一个，干脆返回 null
 	  　　|-> 有多个构造方法, 且在其中一个方法上标注了 @Autowired , 则会返回这个标注的构造方法
 	  　　|-> 有多个构造方法, 且在多个方法上标注了@Autowired, 则spring会抛出异常, spring会认为, 你指定了几个给我, 是不是你弄错了
 	 */
@@ -305,7 +304,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 		// Quick check on the concurrent map first, with minimal locking.
 		// 开始检查构造函数，
-		// 如果之前已经有用构造方法实例化 bean，就会有缓存，原型模式和 scope 模式会有再次使用的时候
+		// 如果之前已经有用构造方法实例化 bean，就会有缓存
 		Constructor<?>[] candidateConstructors = this.candidateConstructorsCache.get(beanClass);
 		if (candidateConstructors == null) {
 			// Fully synchronized resolution now...
@@ -328,7 +327,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 					List<Constructor<?>> candidates = new ArrayList<>(rawCandidates.length);
 					Constructor<?> requiredConstructor = null;
 					Constructor<?> defaultConstructor = null;
-					// Kotlin 检测 ，检测 class 是否属于 Kotlin 类型，如果是则解析返回 Kotlin 主构造函数 其他情况一律返回 null
+					// Kotlin 处理 对于 java 一般默认的返回 null
 					Constructor<?> primaryConstructor = BeanUtils.findPrimaryConstructor(beanClass);
 					int nonSyntheticConstructors = 0;
 					//遍历这些构造函数
@@ -342,8 +341,8 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 						else if (primaryConstructor != null) {
 							continue;
 						}
-						//查看是否有 @Autowired 注解
-						//如果有多个构造方法, 可以通过标注 @Autowired 的方式来指定使用哪个构造方法
+						//查看当前构造方法是否标有 @Autowired 注解
+						//当有多个构造方法, 可以通过标注 @Autowired 的方式来指定使用哪个构造方法
 						MergedAnnotation<?> ann = findAutowiredAnnotation(candidate);
 						if (ann == null) {
 							//如果没有@Autowired注解，查找父类的构造方法有没有@Autowired注解
@@ -361,15 +360,14 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 						}
 						//有 @Autowired 的情况
 						if (ann != null) {
-							//当@Autowired注解的构造方法不止一个，那上一次处理的候选构造方法
-							//已经设置到requiredConstructor 中，那么第二个@Autowired注解的
-							//候选构造方法处理的时候就会抛异常
+							//在多个方法上标注了 @Autowired , 则spring会抛出异常, spring会认为, 你指定了几个给我, 是不是你弄错了
 							if (requiredConstructor != null) {
 								throw new BeanCreationException(beanName,
 										"Invalid autowire-marked constructor: " + candidate +
 										". Found constructor with 'required' Autowired annotation already: " +
 										requiredConstructor);
 							}
+							//获取autowire注解中required属性值
 							boolean required = determineRequiredStatus(ann);
 							if (required) {
 								if (!candidates.isEmpty()) {
@@ -378,12 +376,12 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 											". Found constructor with 'required' Autowired annotation: " +
 											candidate);
 								}
-								//第一个处理的有@autowired处理的构造方法设置requiredConstructor ，并设置到candidates中
+								//当前候选构造方法
 								requiredConstructor = candidate;
 							}
+							//加入候选构造方法列表
 							candidates.add(candidate);
 						}
-						//无参构造函数的情况
 						//当构造方法没有@Autowired注解且参数个数为0，选为defaultConstructor
 						else if (candidate.getParameterCount() == 0) {
 							//构造函数没有参数, 则设置为默认的构造函数
@@ -406,11 +404,11 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 										"default constructor to fall back to: " + candidates.get(0));
 							}
 						}
-						//候选方法不为空的时候进入此处，此时就一个@Autowired注解的构造方法
+						//候选方法放入缓存
 						candidateConstructors = candidates.toArray(new Constructor<?>[0]);
 					}
 					//当获取的所有构造方法只有一个，且不是@autowired注解的（注解的在上面处理了）
-					//类的构造方法只有1个, 且该构造方法有多个参数
+					//且该构造方法有多个参数
 					else if (rawCandidates.length == 1 && rawCandidates[0].getParameterCount() > 0) {
 						candidateConstructors = new Constructor<?>[] {rawCandidates[0]};
 					}
@@ -424,11 +422,10 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 						candidateConstructors = new Constructor<?>[] {primaryConstructor};
 					}
 					else {
-						//如果方法进了这里, 就是没找到合适的构造方法
-						//1. 类定义了多个构造方法, 且没有 @Autowired , 则有可能会进这里
+						//没找到合适的构造函数
 						candidateConstructors = new Constructor<?>[0];
 					}
-					//缓存选定的候选构造方法，供原型模式和scope模式第二次实例化时使用
+					//缓存选定的候选构造方法
 					this.candidateConstructorsCache.put(beanClass, candidateConstructors);
 				}
 			}

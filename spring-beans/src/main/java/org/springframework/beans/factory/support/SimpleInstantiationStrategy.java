@@ -92,7 +92,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 		}
 		else {
 			// Must generate CGLIB subclass.
-			// 使用CGLIB代理实例化
+			// 必须使用CGLIB代理实例化，这里调用的是 Cglib 子类的方法
 			return instantiateWithMethodInjection(bd, beanName, owner);
 		}
 	}

@@ -598,7 +598,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
 				try {
-					// 2. bean 合并后的处理，
+					// 2. bean 创建后的处理
 					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
 				}
 				catch (Throwable ex) {
@@ -1246,6 +1246,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Candidate constructors for autowiring?
 		// 第一次推断构造方法 determineConstructorsFromBeanPostProcessors ,
+		// 通过注解方式配置会走这个
 		// 在对象实例化之前的回调处理,可以用来选择使用哪些构造函数
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 		if (ctors != null ||
