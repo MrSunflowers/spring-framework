@@ -1,5 +1,8 @@
 package org.springframework.myTest;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 /**
  * @Description
  * @Author lyk
@@ -7,10 +10,12 @@ package org.springframework.myTest;
  * @Since 1.0
  * @Date 2021/6/21
  */
+@Component
 public class UserA {
 	private String name;
 	private int age;
 	private int email;
+	@Autowired
 	private UserB userB;
 
 	public String getName() {

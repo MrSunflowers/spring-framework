@@ -2,11 +2,16 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	   xmlns:myname="http://www.Sunflower.org/schema/userA"
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans
 	   http://www.springframework.org/schema/beans/spring-beans.xsd
 	   http://www.Sunflower.org/schema/userA
-	   http://www.Sunflower.org/schema/userA.xsd"
+	   http://www.Sunflower.org/schema/userA.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd"
 >
+
+	<context:annotation-config/>
+	<context:component-scan base-package="org.springframework.myTest"/>
+
 	<!-- 自定义标签 -->
 	<!--<myname:userA id="userA" name="username" age="18" email="12345875" />-->
 
@@ -33,13 +38,13 @@
 
 
 	<!--ColorFactoryTest begin-->
-	<bean id="red" factory-bean="colorFactory" factory-method="getInstance">
+	<!--<bean id="red" factory-bean="colorFactory" factory-method="getInstance">
 		<constructor-arg name="ags" value="123"></constructor-arg>
 	</bean>
 	<bean id="colorFactory" class="org.springframework.myTest.factoryBeanTest.ColorFactoryTest"></bean>
 	<bean id="car" class="org.springframework.myTest.factoryBeanTest.Car">
 		<property name="color" ref="red"></property>
-	</bean>
+	</bean>-->
 	<!--ColorFactoryTest end-->
 
 

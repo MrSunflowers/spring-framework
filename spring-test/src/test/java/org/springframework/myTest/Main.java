@@ -2,9 +2,12 @@ package org.springframework.myTest;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -24,9 +27,16 @@ import org.springframework.myTest.factoryBeanTest.Red;
 public class Main {
 
 	public static void main(String[] args) {
-		Resource resource = new ClassPathResource("myTestResources/applicationContext.xml");
+		/*Resource resource = new ClassPathResource("myTestResources/applicationContext.xml");
 		XmlBeanFactory beanFactory = new XmlBeanFactory(resource);
-		FactoryBeanTest(beanFactory);
+		earlySingletonTest(beanFactory);*/
+		AnnotationConfigApplicationContext classPathXmlApplicationContext = new AnnotationConfigApplicationContext("org/springframework/myTest");
+		UserA userA = (UserA)classPathXmlApplicationContext.getBean("userA");
+		UserB userB = (UserB)classPathXmlApplicationContext.getBean("userB");
+		System.out.println(userA.getUserB().equals(userB));
+		System.out.println(userB.getUserA().equals(userA));
+
+
 	}
 	/**
 	 * description: 构造器测试 <br>
