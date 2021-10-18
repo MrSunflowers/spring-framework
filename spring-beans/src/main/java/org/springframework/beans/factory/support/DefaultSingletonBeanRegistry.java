@@ -77,13 +77,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/** Cache of singleton objects: bean name to bean instance.<p>一级缓存 单例对象缓存 存储初始化以后的完整的 bean</p> */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
-	/** Cache of singleton factories: bean name to ObjectFactory. <p>三级缓存 存储 lambda 表达式 ，未实例化的 bean</p>*/
+	/** Cache of singleton factories: bean name to ObjectFactory. <p>三级缓存 创建实例的ObjectFactory实现</p>*/
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
 	/** Cache of early singleton objects: bean name to bean instance. <p>二级缓存 存放实例化 但未初始化的 bean 半成品对象</p> */
 	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
 
-	/** Set of registered singletons, containing the bean names in registration order. */
+	/** Set of registered singletons, containing the bean names in registration order. <br>表示哪些类被注册过了*/
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
 	/** Names of beans that are currently in creation. */
@@ -155,8 +155,11 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		Assert.notNull(singletonFactory, "Singleton factory must not be null");
 		synchronized (this.singletonObjects) {
 			if (!this.singletonObjects.containsKey(beanName)) {
+				//三级缓存 创建实例的ObjectFactory实现
 				this.singletonFactories.put(beanName, singletonFactory);
+				//将bean从二级缓存中移除
 				this.earlySingletonObjects.remove(beanName);
+				//表示哪些类被注册过了，加入
 				this.registeredSingletons.add(beanName);
 			}
 		}

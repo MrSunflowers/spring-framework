@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
  * @Since 1.0
  * @Date 2021/6/21
  */
-@Component
 public class UserA {
 	private String name;
 	private int age;

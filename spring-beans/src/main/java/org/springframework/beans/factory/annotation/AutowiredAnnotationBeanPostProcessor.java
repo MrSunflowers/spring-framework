@@ -486,6 +486,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 		String cacheKey = (StringUtils.hasLength(beanName) ? beanName : clazz.getName());
 		// Quick check on the concurrent map first, with minimal locking.
 		InjectionMetadata metadata = this.injectionMetadataCache.get(cacheKey);
+		//从缓存获取并判断是否需要刷新
 		if (InjectionMetadata.needsRefresh(metadata, clazz)) {
 			synchronized (this.injectionMetadataCache) {
 				metadata = this.injectionMetadataCache.get(cacheKey);
@@ -502,30 +503,38 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 	}
 
 	private InjectionMetadata buildAutowiringMetadata(final Class<?> clazz) {
+		//确定给定的类是否是有要扫描的注解
 		if (!AnnotationUtils.isCandidateClass(clazz, this.autowiredAnnotationTypes)) {
 			return InjectionMetadata.EMPTY;
 		}
 
 		List<InjectionMetadata.InjectedElement> elements = new ArrayList<>();
+		//需要处理的目标类
 		Class<?> targetClass = clazz;
 
 		do {
 			final List<InjectionMetadata.InjectedElement> currElements = new ArrayList<>();
 
+			// 1.通过反射获取该类所有的字段，并遍历每一个字段，通过方法 findAutowiredAnnotation 遍历每一个字段的所用注解，
+			// 如果用autowired修饰了，则返回 auotowired 相关属性
 			ReflectionUtils.doWithLocalFields(targetClass, field -> {
 				MergedAnnotation<?> ann = findAutowiredAnnotation(field);
 				if (ann != null) {
+					// 校验autowired注解是否用在了static方法上
 					if (Modifier.isStatic(field.getModifiers())) {
+						//静态字段不支持自动注入
 						if (logger.isInfoEnabled()) {
 							logger.info("Autowired annotation is not supported on static fields: " + field);
 						}
 						return;
 					}
+					//Required属性校验
 					boolean required = determineRequiredStatus(ann);
 					currElements.add(new AutowiredFieldElement(field, required));
 				}
 			});
 
+			//2.通过反射处理类的method
 			ReflectionUtils.doWithLocalMethods(targetClass, method -> {
 				Method bridgedMethod = BridgeMethodResolver.findBridgedMethod(method);
 				if (!BridgeMethodResolver.isVisibilityBridgeMethodPair(method, bridgedMethod)) {
@@ -534,6 +543,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 				MergedAnnotation<?> ann = findAutowiredAnnotation(bridgedMethod);
 				if (ann != null && method.equals(ClassUtils.getMostSpecificMethod(method, clazz))) {
 					if (Modifier.isStatic(method.getModifiers())) {
+						//静态方法不支持自动注入
 						if (logger.isInfoEnabled()) {
 							logger.info("Autowired annotation is not supported on static methods: " + method);
 						}
@@ -545,13 +555,15 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 									method);
 						}
 					}
+					//Required属性校验
 					boolean required = determineRequiredStatus(ann);
 					PropertyDescriptor pd = BeanUtils.findPropertyForMethod(bridgedMethod, clazz);
 					currElements.add(new AutowiredMethodElement(method, required, pd));
 				}
 			});
-
+			//用@Autowired修饰的注解可能不止一个，因此都加在 elements 这个容器里面，一起处理
 			elements.addAll(0, currElements);
+			// 类似递归去寻找他父类的注入信息
 			targetClass = targetClass.getSuperclass();
 		}
 		while (targetClass != null && targetClass != Object.class);

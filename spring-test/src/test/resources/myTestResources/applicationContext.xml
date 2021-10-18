@@ -16,12 +16,12 @@
 	<!--<myname:userA id="userA" name="username" age="18" email="12345875" />-->
 
 	<!--循环依赖-->
-	<!--<bean name="userA" class="org.springframework.myTest.UserA"  >
-		<property name="userB" ref="userB"></property>
+	<bean name="userA" class="org.springframework.myTest.UserA">
+		<!--<property name="userB" ref="userB"></property>-->
 	</bean>
-	<bean name="userB" class="org.springframework.myTest.UserB" >
-		<property name="userA" ref="userA"></property>
-	</bean>-->
+	<bean name="userB" class="org.springframework.myTest.UserB">
+		<!--<property name="userA" ref="userA"></property>-->
+	</bean>
 
 	<!--<bean name="user" class="org.springframework.myTest.User" init-method="init">
 		<constructor-arg name="name" value="userName"></constructor-arg>

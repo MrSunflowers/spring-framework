@@ -30,11 +30,16 @@ public class Main {
 		/*Resource resource = new ClassPathResource("myTestResources/applicationContext.xml");
 		XmlBeanFactory beanFactory = new XmlBeanFactory(resource);
 		earlySingletonTest(beanFactory);*/
-		AnnotationConfigApplicationContext classPathXmlApplicationContext = new AnnotationConfigApplicationContext("org/springframework/myTest");
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
+		UserA userA = (UserA)context.getBean("userA");
+		UserB userB = (UserB)context.getBean("userB");
+		System.out.println(userA.getUserB().equals(userB));
+		System.out.println(userB.getUserA().equals(userA));
+		/*AnnotationConfigApplicationContext classPathXmlApplicationContext = new AnnotationConfigApplicationContext("org/springframework/myTest");
 		UserA userA = (UserA)classPathXmlApplicationContext.getBean("userA");
 		UserB userB = (UserB)classPathXmlApplicationContext.getBean("userB");
 		System.out.println(userA.getUserB().equals(userB));
-		System.out.println(userB.getUserA().equals(userA));
+		System.out.println(userB.getUserA().equals(userA));*/
 
 
 	}
