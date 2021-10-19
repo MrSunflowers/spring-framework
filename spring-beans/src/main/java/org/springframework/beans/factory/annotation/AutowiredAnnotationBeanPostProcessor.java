@@ -243,7 +243,9 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 	@Override
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
+		//扫描注解
 		InjectionMetadata metadata = findAutowiringMetadata(beanName, beanType, null);
+		//注解检查
 		metadata.checkConfigMembers(beanDefinition);
 	}
 
@@ -515,12 +517,13 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 		do {
 			final List<InjectionMetadata.InjectedElement> currElements = new ArrayList<>();
 
-			// 1.通过反射获取该类所有的字段，并遍历每一个字段，通过方法 findAutowiredAnnotation 遍历每一个字段的所用注解，
+			// 1.通过反射获取该类所有的字段，并遍历每一个字段，
+			// 通过方法 findAutowiredAnnotation 遍历每一个字段的所用注解，
 			// 如果用autowired修饰了，则返回 auotowired 相关属性
 			ReflectionUtils.doWithLocalFields(targetClass, field -> {
 				MergedAnnotation<?> ann = findAutowiredAnnotation(field);
 				if (ann != null) {
-					// 校验autowired注解是否用在了static方法上
+					// 校验注解是否用在了static字段上
 					if (Modifier.isStatic(field.getModifiers())) {
 						//静态字段不支持自动注入
 						if (logger.isInfoEnabled()) {
@@ -528,8 +531,9 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 						}
 						return;
 					}
-					//Required属性校验
+					//确定Required属性的值
 					boolean required = determineRequiredStatus(ann);
+					//记录需要注入的字段
 					currElements.add(new AutowiredFieldElement(field, required));
 				}
 			});
@@ -555,9 +559,10 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 									method);
 						}
 					}
-					//Required属性校验
+					//确定Required属性的值
 					boolean required = determineRequiredStatus(ann);
 					PropertyDescriptor pd = BeanUtils.findPropertyForMethod(bridgedMethod, clazz);
+					//记录需要注入的方法
 					currElements.add(new AutowiredMethodElement(method, required, pd));
 				}
 			});

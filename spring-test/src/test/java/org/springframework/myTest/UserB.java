@@ -14,7 +14,7 @@ public class UserB {
 	private String name;
 	private int age;
 	private int email;
-	@Autowired
+	@Autowired(required = false)
 	private UserA userA;
 
 	public String getName() {
