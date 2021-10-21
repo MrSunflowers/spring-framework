@@ -362,7 +362,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 						}
 						//有 @Autowired 的情况
 						if (ann != null) {
-							//在多个方法上标注了 @Autowired , 则spring会抛出异常, spring会认为, 你指定了几个给我, 是不是你弄错了
+							//在多个方法上标注了 @Autowired , 则spring会抛出异常, 不知道使用哪个
 							if (requiredConstructor != null) {
 								throw new BeanCreationException(beanName,
 										"Invalid autowire-marked constructor: " + candidate +
@@ -370,6 +370,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 										requiredConstructor);
 							}
 							//获取autowire注解中required属性值
+							//若required=true又有多个标注autowire的构造方法，则报错
 							boolean required = determineRequiredStatus(ann);
 							if (required) {
 								if (!candidates.isEmpty()) {
@@ -392,10 +393,12 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 					}
 					//到这里, 已经循环完了所有的构造方法
 					if (!candidates.isEmpty()) {
+						//成功找到了含有@Autowired注解的构造方法
 						// Add default constructor to list of optional constructors, as fallback.
-						// 将默认构造函数添加到可选构造函数列表中，作为后备。
 						if (requiredConstructor == null) {
+							//没有找到@Autowired required=true的构造方法
 							if (defaultConstructor != null) {
+								//将默认构造函数添加到可选构造函数列表中，作为后备。
 								//往候选方法中加入defaultConstructor
 								candidates.add(defaultConstructor);
 							}

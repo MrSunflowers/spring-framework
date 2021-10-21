@@ -14,8 +14,12 @@ public class UserA {
 	private String name;
 	private int age;
 	private int email;
-	@Autowired(required = false)
 	private UserB userB;
+
+	@Autowired
+	private UserA(UserB userB) {
+		this.userB = userB;
+	}
 
 	public String getName() {
 		return name;
