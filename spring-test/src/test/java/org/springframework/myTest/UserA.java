@@ -1,7 +1,12 @@
 package org.springframework.myTest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
 
 /**
  * @Description
@@ -16,16 +21,17 @@ public class UserA {
 	private int email;
 	private UserB userB;
 
-	@Autowired
 	private UserA(UserB userB) {
 		this.userB = userB;
 	}
 
+
 	public String getName() {
 		return name;
 	}
-
+	@Value("asd")
 	public void setName(String name) {
+		System.out.println(name);
 		this.name = name;
 	}
 
@@ -52,5 +58,15 @@ public class UserA {
 	public void setUserB(UserB userB) {
 		this.userB = userB;
 	}
+
+	@PostConstruct
+	public void initMethod(int q){
+		System.out.println("initMethod");
+	}
+	@PreDestroy
+	public void destroyMethod(int q){
+		System.out.println("destroyMethod");
+	}
+
 
 }

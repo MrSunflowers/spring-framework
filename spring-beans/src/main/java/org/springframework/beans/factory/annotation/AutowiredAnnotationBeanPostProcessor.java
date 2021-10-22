@@ -245,7 +245,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
 		//扫描注解
 		InjectionMetadata metadata = findAutowiringMetadata(beanName, beanType, null);
-		//注解检查
+		//如果集合里有注解的属性和方法，就会将他们注册到beanDefinition的集合externallyManagedConfigMembers中
 		metadata.checkConfigMembers(beanDefinition);
 	}
 
@@ -272,16 +272,20 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 		// Let's check for lookup methods here...
 		// 检测 Lookup 注解
 		if (!this.lookupMethodsChecked.contains(beanName)) {
+			//确定类中是否有Lookup注解标注的方法
 			if (AnnotationUtils.isCandidateClass(beanClass, Lookup.class)) {
 				try {
 					Class<?> targetClass = beanClass;
 					do {
 						ReflectionUtils.doWithLocalMethods(targetClass, method -> {
+							//遍历所有方法并获取Lookup注解
 							Lookup lookup = method.getAnnotation(Lookup.class);
 							if (lookup != null) {
 								Assert.state(this.beanFactory != null, "No BeanFactory available");
 								LookupOverride override = new LookupOverride(method, lookup.value());
 								try {
+									//这里和之前的xml解析一样
+									//记录在了 AbstractBeanDefinition 中的 methodOverrides 属性中
 									RootBeanDefinition mbd = (RootBeanDefinition)
 											this.beanFactory.getMergedBeanDefinition(beanName);
 									mbd.getMethodOverrides().addOverride(override);
@@ -292,6 +296,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 								}
 							}
 						});
+						//向父类中寻找
 						targetClass = targetClass.getSuperclass();
 					}
 					while (targetClass != null && targetClass != Object.class);
@@ -558,6 +563,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 					}
 					if (method.getParameterCount() == 0) {
 						if (logger.isInfoEnabled()) {
+							//自动装配的注解应该只用在有参数的方法上
 							logger.info("Autowired annotation should only be used on methods with parameters: " +
 									method);
 						}
