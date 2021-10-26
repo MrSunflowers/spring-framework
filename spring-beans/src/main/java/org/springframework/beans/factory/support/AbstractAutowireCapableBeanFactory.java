@@ -1623,7 +1623,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		//TreeSet:TreeSet底层是二叉树，可以对对象元素进行排序，
 		// 但是自定义类需要实现comparable接口，重写comparaTo()方法。
 		Set<String> result = new TreeSet<>();
-		//获取 mdbd 的所有属性值
+		//获取 mdbd 的所有属性值 (xml中配置的 property )
 		PropertyValues pvs = mbd.getPropertyValues();
 		//PropertyDescriptor类：(属性描述器)
 		//　　PropertyDescriptor类表示JavaBean类通过存储器导出一个属性。主要方法：
@@ -1640,6 +1640,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Method methodSetUserName = propDesc.getWriteMethod();
 		// 写入属性值
 		// methodSetUserName.invoke(userInfo, "wong");
+		// 获取 bean 中所有的属性 + class 属性
 		PropertyDescriptor[] pds = bw.getPropertyDescriptors();
 		//遍历属性描述对象
 		for (PropertyDescriptor pd : pds) {
