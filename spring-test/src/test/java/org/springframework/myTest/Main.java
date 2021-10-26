@@ -27,12 +27,12 @@ import org.springframework.myTest.factoryBeanTest.Red;
 public class Main {
 
 	public static void main(String[] args) {
-		/*Resource resource = new ClassPathResource("myTestResources/applicationContext.xml");
+		Resource resource = new ClassPathResource("myTestResources/applicationContext.xml");
 		XmlBeanFactory beanFactory = new XmlBeanFactory(resource);
-		earlySingletonTest(beanFactory);*/
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
+		earlySingletonTest(beanFactory);
+		/*ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
 		UserA userA = (UserA)context.getBean("userA");
-		UserB userB = (UserB)context.getBean("userB");
+		UserB userB = (UserB)context.getBean("userB");*/
 		//System.out.println(userA.getUserB().equals(userB));
 		//System.out.println(userB.getUserA().equals(userA));
 		/*AnnotationConfigApplicationContext classPathXmlApplicationContext = new AnnotationConfigApplicationContext("org/springframework/myTest");

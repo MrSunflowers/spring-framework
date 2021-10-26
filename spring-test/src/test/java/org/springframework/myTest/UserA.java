@@ -21,17 +21,12 @@ public class UserA {
 	private int email;
 	private UserB userB;
 
-	private UserA(UserB userB) {
-		this.userB = userB;
-	}
 
 
 	public String getName() {
 		return name;
 	}
-	@Value("asd")
 	public void setName(String name) {
-		System.out.println(name);
 		this.name = name;
 	}
 
@@ -59,14 +54,6 @@ public class UserA {
 		this.userB = userB;
 	}
 
-	@PostConstruct
-	public void initMethod(int q){
-		System.out.println("initMethod");
-	}
-	@PreDestroy
-	public void destroyMethod(int q){
-		System.out.println("destroyMethod");
-	}
 
 
 }

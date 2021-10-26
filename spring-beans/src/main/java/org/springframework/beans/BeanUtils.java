@@ -600,12 +600,17 @@ public abstract class BeanUtils {
 	 * @return a corresponding MethodParameter object
 	 */
 	public static MethodParameter getWriteMethodParameter(PropertyDescriptor pd) {
+		// GenericTypeAwarePropertyDescriptor:通用属性描述器，用于保存 <property/>中的相关信息(例：属性所属类Class，属性的对应
+		// get/set 方法 Method 对象等)；
 		if (pd instanceof GenericTypeAwarePropertyDescriptor) {
+			//返回pd的setter的方法参数包装对象
 			return new MethodParameter(((GenericTypeAwarePropertyDescriptor) pd).getWriteMethodParameter());
 		}
 		else {
+			//获取pd的属性setter方法
 			Method writeMethod = pd.getWriteMethod();
 			Assert.state(writeMethod != null, "No write method available");
+			//新建一个方法参数包装对象对witerMethodd进行包装，指定该方法的参数为第一个
 			return new MethodParameter(writeMethod, 0);
 		}
 	}

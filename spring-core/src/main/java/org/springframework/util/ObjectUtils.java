@@ -167,10 +167,12 @@ public abstract class ObjectUtils {
 	public static Object unwrapOptional(@Nullable Object obj) {
 		if (obj instanceof Optional) {
 			Optional<?> optional = (Optional<?>) obj;
+			// Optional 包装的对象没有值
 			if (!optional.isPresent()) {
 				return null;
 			}
 			Object result = optional.get();
+			//不支持多个 Optional 嵌套
 			Assert.isTrue(!(result instanceof Optional), "Multi-level Optional usage not supported");
 			return result;
 		}
