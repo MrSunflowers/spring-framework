@@ -1468,6 +1468,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		int resolvedAutowireMode = mbd.getResolvedAutowireMode();
 		//2.按属性类型或是按属性名称
 		if (resolvedAutowireMode == AUTOWIRE_BY_NAME || resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
+			//创建一个新的 MutablePropertyValues 来存放 xml 中配置的 property 属性和解析到的需要自动注入的属性
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
 			// Add property values based on autowire by name if applicable.
 			// 按名称注入
@@ -1475,7 +1476,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				autowireByName(beanName, mbd, bw, newPvs);
 			}
 			// Add property values based on autowire by type if applicable.
-			// 安类型注入
+			// 按类型注入
 			if (resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
 				autowireByType(beanName, mbd, bw, newPvs);
 			}
@@ -1573,25 +1574,30 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		//获取工厂的自定义类型转换器
 		TypeConverter converter = getCustomTypeConverter();
 		if (converter == null) {
+			//没有就使用 BeanWrapper 来充当默认的类型转换器
 			converter = bw;
 		}
 		//存放所有候选Bean名的集合
 		Set<String> autowiredBeanNames = new LinkedHashSet<>(4);
 		String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
-		//遍历属性名数组
+		//遍历需要自动注入的属性数组
 		for (String propertyName : propertyNames) {
 			try {
 				PropertyDescriptor pd = bw.getPropertyDescriptor(propertyName);
 				// Don't try autowiring by type for type Object: never makes sense,
 				// even if it technically is a unsatisfied, non-simple property.
-				//不要尝试按类型为 Object 类型自动装配：永远没有意义，即使它在技术上是一个不满意的、非简单的属性。
+				// 不要尝试按类型为 Object 类型自动装配：永远没有意义，即使它在技术上是一个不满意的、非简单的属性。
 				if (Object.class != pd.getPropertyType()) {
-					//获取pd属性的Setter方法的方法参数包装对象
+					//获取属性的 Setter 方法的包装对象
 					MethodParameter methodParam = BeanUtils.getWriteMethodParameter(pd);
 					// Do not allow eager init for type matching in case of a prioritized post-processor.
-					// 判断bean对象是否是PriorityOrder实例，如果是就不允许急于初始化来进行类型匹配。
+					// 判断当前被注入的 bean 对象是否是 PriorityOrder 实例，如果是就不允许急于初始化来进行类型匹配。
 					boolean eager = !(bw.getWrappedInstance() instanceof PriorityOrdered);
+					// 这个方法表示在寻找合适的setter方法进行属性注入时，从不考虑参数名称
+					// 就是使用 byType 的形式的自动装配，当此 Type 的 Bean 有多个时，
+					// 将会直接抛出错误，而不是再根据参数的 Name 去匹配第二遍
 					DependencyDescriptor desc = new AutowireByTypeDependencyDescriptor(methodParam, eager);
+					//根据类型查找依赖，是 Spring 进行依赖查找的核心
 					Object autowiredArgument = resolveDependency(desc, beanName, autowiredBeanNames, converter);
 					if (autowiredArgument != null) {
 						pvs.add(propertyName, autowiredArgument);

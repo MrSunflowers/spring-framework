@@ -2,6 +2,7 @@ package org.springframework.myTest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.myTest.factoryBeanTest.TestUser;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -19,7 +20,7 @@ public class UserA {
 	private String name;
 	private int age;
 	private int email;
-	private UserB userB;
+	private TestUser userB;
 
 
 
@@ -46,14 +47,11 @@ public class UserA {
 		this.email = email;
 	}
 
-	public UserB getUserB() {
+	public TestUser getUserB() {
 		return userB;
 	}
 
-	public void setUserB(UserB userB) {
+	public void setUserB(TestUser userB) {
 		this.userB = userB;
 	}
-
-
-
 }

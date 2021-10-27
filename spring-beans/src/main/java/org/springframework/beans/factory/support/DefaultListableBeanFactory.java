@@ -1298,9 +1298,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	@Nullable
 	public Object resolveDependency(DependencyDescriptor descriptor, @Nullable String requestingBeanName,
 			@Nullable Set<String> autowiredBeanNames, @Nullable TypeConverter typeConverter) throws BeansException {
-
+		//初始化参数名称解析器，默认有两种实现，分别使用反射和本地变量表来实现参数名称的解析
 		descriptor.initParameterNameDiscovery(getParameterNameDiscoverer());
-		//如需，进行 Optional 包装处理
+		// 1. Optional : java 8 新提供的API
+		// 如果参数类型为 Optional 尝试使用 Optional 包装
 		if (Optional.class == descriptor.getDependencyType()) {
 			return createOptionalDependency(descriptor, requestingBeanName);
 		}
@@ -1315,7 +1316,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 		//处理依赖注入逻辑
 		else {
-			//getAutowireCandidateResolver() 自动绑定处理器
+			//getAutowireCandidateResolver() 方法：自动绑定处理器
 			Object result = getAutowireCandidateResolver().getLazyResolutionProxyIfNecessary(
 					descriptor, requestingBeanName);
 			if (result == null) {

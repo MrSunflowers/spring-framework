@@ -63,16 +63,10 @@ public class Main {
 	private static void earlySingletonTest(XmlBeanFactory beanFactory) {
 		UserA userA = (UserA)beanFactory.getBean("userA");
 		UserB userB = (UserB)beanFactory.getBean("userB");
-		System.out.println(userA.getUserB().equals(userB));
-		System.out.println(userB.getUserA().equals(userA));
+		/*System.out.println(userA.getUserB().equals(userB));
+		System.out.println(userB.getUserA().equals(userA));*/
 	}
 
-	private static void InstanceSupplierTest(XmlBeanFactory beanFactory) {
-		GenericBeanDefinition genericBeanDefinition = (GenericBeanDefinition) beanFactory.getBeanDefinition("user");
-		genericBeanDefinition.setInstanceSupplier(Main::getUser);
-		User user = (User)beanFactory.getBean("user");
-		System.out.println(user.getName());
-	}
 
 	private static void FactoryBeanTest(XmlBeanFactory beanFactory) {
 		Car car = (Car) beanFactory.getBean("car");
@@ -86,9 +80,6 @@ public class Main {
 	}
 
 
-	public static User getUser(){
-		return new User("zhangsan");
-	}
 
 
 

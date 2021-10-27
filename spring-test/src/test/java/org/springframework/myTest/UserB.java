@@ -1,6 +1,7 @@
 package org.springframework.myTest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.myTest.factoryBeanTest.TestUser;
 import org.springframework.stereotype.Component;
 
 /**
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Component;
  * @Since 1.0
  * @Date 2021/6/21
  */
-public class UserB {
+public class UserB implements TestUser {
 	private String name;
 	private int age;
 	private int email;

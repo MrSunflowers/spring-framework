@@ -16,10 +16,12 @@
 	<!--<myname:userA id="userA" name="username" age="18" email="12345875" />-->
 
 	<!--循环依赖-->
-	<bean name="userA" class="org.springframework.myTest.UserA" autowire="byName">
+	<bean name="userA" class="org.springframework.myTest.UserA" autowire="byType">
 		<property name="name" value="userAname"/>
 	</bean>
 	<bean name="userB" class="org.springframework.myTest.UserB">
+	</bean>
+	<bean name="user" class="org.springframework.myTest.User">
 	</bean>
 
 	<!--<bean name="user" class="org.springframework.myTest.User" init-method="init">

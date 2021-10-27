@@ -1,17 +1,8 @@
 package org.springframework.myTest;
 
-public class User {
-	private String name;
+import org.springframework.myTest.factoryBeanTest.TestUser;
 
-	public User(String name) {
-		this.name = name;
-	}
+public class User  implements TestUser {
 
-	public String getName() {
-		return name;
-	}
 
-	public void init() {
-		System.out.println("user 初始化.....");
-	}
 }
