@@ -17,11 +17,9 @@
 
 	<!--循环依赖-->
 	<bean name="userA" class="org.springframework.myTest.UserA" autowire="byName">
-		<property name="userB" ref="userB"/>
 		<property name="name" value="userAname"/>
 	</bean>
 	<bean name="userB" class="org.springframework.myTest.UserB">
-		<property name="userA" ref="userA"/>
 	</bean>
 
 	<!--<bean name="user" class="org.springframework.myTest.User" init-method="init">

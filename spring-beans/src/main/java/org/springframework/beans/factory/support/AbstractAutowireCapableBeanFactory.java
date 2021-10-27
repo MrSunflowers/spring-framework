@@ -142,13 +142,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	/**
 	 * Dependency types to ignore on dependency check and autowire, as Set of
-	 * Class objects: for example, String. Default is none.
+	 * Class objects: for example, String. Default is none.<br/>
+	 * 忽略的自动注入类型
 	 */
 	private final Set<Class<?>> ignoredDependencyTypes = new HashSet<>();
 
 	/**
 	 * Dependency interfaces to ignore on dependency check and autowire, as Set of
-	 * Class objects. By default, only the BeanFactory interface is ignored.
+	 * Class objects. By default, only the BeanFactory interface is ignored.<br/>
+	 * 有时候接口中会有 setXxx 方法，它不需要被注入，在这里添加忽略
 	 */
 	private final Set<Class<?>> ignoredDependencyInterfaces = new HashSet<>();
 
@@ -1459,9 +1461,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
+		//获取 xml 中配置的 property 属性
 		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
 
-		//获取自动装配方式
+		//获取自动装配方式( 就是xml中配置的 autowire 属性 )
 		int resolvedAutowireMode = mbd.getResolvedAutowireMode();
 		//2.按属性类型或是按属性名称
 		if (resolvedAutowireMode == AUTOWIRE_BY_NAME || resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
@@ -1530,15 +1533,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected void autowireByName(
 			String beanName, AbstractBeanDefinition mbd, BeanWrapper bw, MutablePropertyValues pvs) {
-		// 获取 bw 中有setter方法的，非简单类型属性的，
-		// PropertyValues 中没有该 pd 的属性名的 PropertyDescriptor 属性名数组
+		// 获取 bean 中需要自动装配的属性集合
 		String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
+		// 遍历属性
 		for (String propertyName : propertyNames) {
 			if (containsBean(propertyName)) {
 				//循环初始化相关bean
 				Object bean = getBean(propertyName);
 				pvs.add(propertyName, bean);
-				//注册依赖
+				//注册依赖，告诉容器说我当前被注入的bean初始化的时候需要依赖哪些bean
 				registerDependentBean(propertyName, beanName);
 				if (logger.isTraceEnabled()) {
 					logger.trace("Added autowiring by name from bean name '" + beanName +
@@ -1613,17 +1616,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	/**
 	 * Return an array of non-simple bean properties that are unsatisfied.
 	 * These are probably unsatisfied references to other beans in the
-	 * factory. Does not include simple properties like primitives or Strings.
+	 * factory. Does not include simple properties like primitives or Strings.<br/>
+	 * 获取 bean 中需要自动装配的属性集合
 	 * @param mbd the merged bean definition the bean was created with
 	 * @param bw the BeanWrapper the bean was created with
 	 * @return an array of bean property names
 	 * @see org.springframework.beans.BeanUtils#isSimpleProperty
 	 */
 	protected String[] unsatisfiedNonSimpleProperties(AbstractBeanDefinition mbd, BeanWrapper bw) {
-		//TreeSet:TreeSet底层是二叉树，可以对对象元素进行排序，
-		// 但是自定义类需要实现comparable接口，重写comparaTo()方法。
 		Set<String> result = new TreeSet<>();
-		//获取 mdbd 的所有属性值 (xml中配置的 property )
+		//获取 BeanDefinition 中存储的所有属性值 ( xml中配置的 property )
 		PropertyValues pvs = mbd.getPropertyValues();
 		//PropertyDescriptor类：(属性描述器)
 		//　　PropertyDescriptor类表示JavaBean类通过存储器导出一个属性。主要方法：
@@ -1640,11 +1642,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Method methodSetUserName = propDesc.getWriteMethod();
 		// 写入属性值
 		// methodSetUserName.invoke(userInfo, "wong");
-		// 获取 bean 中所有的属性 + class 属性
+		// 从前面包装bean实例的BeanWrapper中获取bean中的所有属性的集合
 		PropertyDescriptor[] pds = bw.getPropertyDescriptors();
-		//遍历属性描述对象
+		//遍历 bean 中的所有属性
 		for (PropertyDescriptor pd : pds) {
-			//如果 pd有写入属性方法 && 该pd不是被排除在依赖项检查之外 && pvs中没有该pd的属性名 && pd的属性类型不是"简单值类型"
+			// 如果当前属性有 setter 方法且 该属性是可以被注入的 且 xml 中的 property 属性中没有配置该属性
+			// 且 该属性不是"简单值类型"，比如一些基本类型和基本类型的包装类型等
 			if (pd.getWriteMethod() != null && !isExcludedFromDependencyCheck(pd) && !pvs.contains(pd.getName()) &&
 					!BeanUtils.isSimpleProperty(pd.getPropertyType())) {
 				result.add(pd.getName());
@@ -1702,7 +1705,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected boolean isExcludedFromDependencyCheck(PropertyDescriptor pd) {
 		return (AutowireUtils.isExcludedFromDependencyCheck(pd) ||
+				// 忽略的自动注入类型
 				this.ignoredDependencyTypes.contains(pd.getPropertyType()) ||
+				// 有时候接口中会有 setXxx 方法，它不需要被注入，在这里忽略
 				AutowireUtils.isSetterDefinedInInterface(pd, this.ignoredDependencyInterfaces));
 	}
 
