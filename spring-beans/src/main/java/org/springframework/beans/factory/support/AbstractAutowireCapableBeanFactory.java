@@ -1438,6 +1438,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected void populateBean(String beanName, RootBeanDefinition mbd, @Nullable BeanWrapper bw) {
 		if (bw == null) {
 			if (mbd.hasPropertyValues()) {
+				//当前 BeanWrapper 为 null 但 BeanDefinition 有值，无法将属性值应用于 null 的实例
 				throw new BeanCreationException(
 						mbd.getResourceDescription(), beanName, "Cannot apply property values to null instance");
 			}
@@ -1483,7 +1484,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			pvs = newPvs;
 		}
 
-		//3.是否有注册的增强器处理
+		//3.增强器处理
 		boolean hasInstAwareBpps = hasInstantiationAwareBeanPostProcessors();
 		//是否需要依赖检查
 		boolean needsDepCheck = (mbd.getDependencyCheck() != AbstractBeanDefinition.DEPENDENCY_CHECK_NONE);
@@ -1517,7 +1518,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		if (pvs != null) {
-			//将属性应用到bean中
+			//5.将属性应用到bean中
 			applyPropertyValues(beanName, mbd, bw, pvs);
 		}
 	}
@@ -1593,11 +1594,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					// Do not allow eager init for type matching in case of a prioritized post-processor.
 					// 判断当前被注入的 bean 对象是否是 PriorityOrder 实例，如果是就不允许急于初始化来进行类型匹配。
 					boolean eager = !(bw.getWrappedInstance() instanceof PriorityOrdered);
-					// 这个方法表示在寻找合适的setter方法进行属性注入时，从不考虑参数名称
+					// 在使用 AutowireByTypeDependencyDescriptor 寻找合适的setter方法进行属性注入时，从不考虑参数名称
 					// 就是使用 byType 的形式的自动装配，当此 Type 的 Bean 有多个时，
 					// 将会直接抛出错误，而不是再根据参数的 Name 去匹配第二遍
+					// 将属性的 setter 方法和属性的类型等信息封装成为一个 DependencyDescriptor
+					// 这个对象非常重要，是依赖注入场景中的非常核心的对象
 					DependencyDescriptor desc = new AutowireByTypeDependencyDescriptor(methodParam, eager);
-					//根据类型查找依赖，是 Spring 进行依赖查找的核心
+					//根据类型查找依赖，是 Spring 进行依赖查找的核心方法
+					//用来根据封装的 DependencyDescriptor 获取到候选的 Bean 对象
 					Object autowiredArgument = resolveDependency(desc, beanName, autowiredBeanNames, converter);
 					if (autowiredArgument != null) {
 						pvs.add(propertyName, autowiredArgument);

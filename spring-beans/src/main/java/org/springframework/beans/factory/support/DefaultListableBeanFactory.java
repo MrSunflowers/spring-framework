@@ -1300,8 +1300,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			@Nullable Set<String> autowiredBeanNames, @Nullable TypeConverter typeConverter) throws BeansException {
 		//初始化参数名称解析器，默认有两种实现，分别使用反射和本地变量表来实现参数名称的解析
 		descriptor.initParameterNameDiscovery(getParameterNameDiscoverer());
-		// 1. Optional : java 8 新提供的API
-		// 如果参数类型为 Optional 尝试使用 Optional 包装
+		// Optional : java 8 新提供的API
+		// 1.如果注入的类型为 Optional 会返回Optional包装好的对象(非懒加载)
 		if (Optional.class == descriptor.getDependencyType()) {
 			return createOptionalDependency(descriptor, requestingBeanName);
 		}
@@ -1332,6 +1332,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		InjectionPoint previousInjectionPoint = ConstructorResolver.setCurrentInjectionPoint(descriptor);
 		try {
+			//快速查找，AutowiredAnnotationBeanPostProcessor增强器会用到，直接调用getBean()方法
 			Object shortcut = descriptor.resolveShortcut(this);
 			if (shortcut != null) {
 				return shortcut;

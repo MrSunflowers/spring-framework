@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import java.util.Optional;
 
 /**
  * @Description
@@ -20,7 +21,7 @@ public class UserA {
 	private String name;
 	private int age;
 	private int email;
-	private TestUser userB;
+	private Optional<UserB> userB;
 
 
 
@@ -47,11 +48,11 @@ public class UserA {
 		this.email = email;
 	}
 
-	public TestUser getUserB() {
+	public Optional<UserB> getUserB() {
 		return userB;
 	}
 
-	public void setUserB(TestUser userB) {
+	public void setUserB(Optional<UserB> userB) {
 		this.userB = userB;
 	}
 }
