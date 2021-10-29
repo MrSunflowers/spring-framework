@@ -78,6 +78,9 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 
 	private int autoGrowCollectionLimit = Integer.MAX_VALUE;
 
+	/**
+	 * 被包装的实例。
+	 */
 	@Nullable
 	Object wrappedObject;
 

@@ -1300,9 +1300,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			@Nullable Set<String> autowiredBeanNames, @Nullable TypeConverter typeConverter) throws BeansException {
 		//初始化参数名称解析器，默认有两种实现，分别使用反射和本地变量表来实现参数名称的解析
 		descriptor.initParameterNameDiscovery(getParameterNameDiscoverer());
-		// Optional : java 8 新提供的API
-		// 1.如果注入的类型为 Optional 会返回Optional包装好的对象(非懒加载)
+		// 判断方法参数类型是否为 Optional 这里的 nestingLevel = 1 所以取 Optional 本身
 		if (Optional.class == descriptor.getDependencyType()) {
+			//1.如果需要注入的参数类型为 Optional 会返回用Optional包装好的对象(非懒加载)
 			return createOptionalDependency(descriptor, requestingBeanName);
 		}
 		//ObjectFactory 或 ObjectProvider 延迟加载的处理
@@ -1332,13 +1332,14 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		InjectionPoint previousInjectionPoint = ConstructorResolver.setCurrentInjectionPoint(descriptor);
 		try {
-			//快速查找，AutowiredAnnotationBeanPostProcessor增强器会用到，直接调用getBean()方法
+			//快速查找，AutowiredAnnotationBeanPostProcessor 增强器会用到，直接调用getBean()方法
 			Object shortcut = descriptor.resolveShortcut(this);
 			if (shortcut != null) {
 				return shortcut;
 			}
-
+			//获取被 Optional 包装的对象类型
 			Class<?> type = descriptor.getDependencyType();
+			//用于解析 @value 注解
 			Object value = getAutowireCandidateResolver().getSuggestedValue(descriptor);
 			if (value != null) {
 				if (value instanceof String) {
@@ -1847,10 +1848,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	/**
 	 * Create an {@link Optional} wrapper for the specified dependency.
+	 * @param descriptor 即将注入的特定依赖项的描述符，包装构造函数参数、方法参数或字段，允许对其元数据的统一访问
+	 * @param beanName 等待注入的 bean 实例名称
+	 * @param args 使用显式参数创建 bean 实例时使用的参数
 	 */
 	private Optional<?> createOptionalDependency(
 			DependencyDescriptor descriptor, @Nullable String beanName, final Object... args) {
-
+		//在这里将 nestingLevel ++ 所以一会通过 descriptor 取参数类型时取的是被 Optional 包装的对象
 		DependencyDescriptor descriptorToUse = new NestedDependencyDescriptor(descriptor) {
 			@Override
 			public boolean isRequired() {

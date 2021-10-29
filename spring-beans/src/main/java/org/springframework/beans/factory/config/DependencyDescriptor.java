@@ -52,40 +52,66 @@ import org.springframework.util.ObjectUtils;
 @SuppressWarnings("serial")
 public class DependencyDescriptor extends InjectionPoint implements Serializable {
 
-	//依赖所在的声明类
+	/**
+	 * 表示原生对象，比如给A中注入B，那么就表示A的class对象，如果被CGLIB加强也不会是代理对象
+	 */
 	private final Class<?> declaringClass;
 
-	//如果依赖是成员方法的某个参数，则这里记录该成员方法的名称
+	/**
+	 * 在使用方法注入时存储使用的setter方法
+	 */
 	@Nullable
 	private String methodName;
 
-	//如果包装的是成员方法的某个参数，则这里记录该参数的类型
+	/**
+	 * 方法参数类型
+	 */
 	@Nullable
 	private Class<?>[] parameterTypes;
 
-	//如果包装的是成员方法的某个参数，则这里记录该参数在该函数参数列表中的索引
+	/**
+	 * 记录该参数在该函数参数列表中的索引
+	 */
 	private int parameterIndex;
 
-	//成员属性的名称
+	/**
+	 * 成员属性的名称
+	 */
 	@Nullable
 	private String fieldName;
 
-	//是否必要依赖
+	/**
+	 * 是否是必须的
+	 */
 	private final boolean required;
 
-	//是否需要饥饿加载
+	/**
+	 * 是否需要饥饿加载，true = 非懒加载
+	 */
 	private final boolean eager;
 
-	//嵌套级别
+	/**
+	 * 目标类型的嵌套等级（通常为1；比如，在列表的列表的情况下，则1表示嵌套列表，而2表示嵌套列表的元素）
+	 * <p>in case of a List of Lists, 1 would indicate the nested List, whereas 2 would indicate the element of the nested List</p>
+	 * <p>或者这么说，被 Optional 包装的类，1表示 Optional 本身而 2 表示被包装的类</p>
+	 */
 	private int nestingLevel = 1;
 
-	//依赖的包含者类，通常和声明类是同一个
+	/**
+	 * 包含的类，当前的方法属于哪个类，如果被代理则指向代理类。
+	 */
 	@Nullable
 	private Class<?> containingClass;
 
+	/**
+	 * 泛型信息
+	 */
 	@Nullable
 	private transient volatile ResolvableType resolvableType;
 
+	/**
+	 * 类型描述
+	 */
 	@Nullable
 	private transient volatile TypeDescriptor typeDescriptor;
 

@@ -62,39 +62,70 @@ public class MethodParameter {
 
 	private static final Annotation[] EMPTY_ANNOTATION_ARRAY = new Annotation[0];
 
-
+	/**
+	 * 当前Method或构造函数对象,Executable 类是 Method 和 Constructor 的父类
+	 */
 	private final Executable executable;
 
+	/**
+	 * 参数的索引：-1 表示方法返回类型； 0 为第一个方法参数； 1 为第二个方法参数等
+	 */
 	private final int parameterIndex;
 
+	/**
+	 * 当前方法/构造函数 {@link #parameterIndex} 位置的参数
+	 */
 	@Nullable
 	private volatile Parameter parameter;
 
+	/**
+	 * 目标类型的嵌套等级（通常为1；比如，在列表的列表的情况下，则1表示嵌套列表，而2表示嵌套列表的元素）
+	 * <p>in case of a List of Lists, 1 would indicate the nested List, whereas 2 would indicate the element of the nested List</p>
+	 */
 	private int nestingLevel;
 
-	/** Map from Integer level to Integer type index. */
+	/** Map from Integer level to Integer type index.<p>从整数嵌套等级到整数类型索引的映射</p> */
 	@Nullable
 	Map<Integer, Integer> typeIndexesPerLevel;
 
-	/** The containing class. Could also be supplied by overriding {@link #getContainingClass()} */
+	/** The containing class. Could also be supplied by overriding {@link #getContainingClass()}
+	 * <p>包含的类，当前的方法属于哪个类。也可以通过覆盖{@link #getContainingClass()}来提供</p>*/
 	@Nullable
 	private volatile Class<?> containingClass;
 
+	/**
+	 * 当前参数类型
+	 */
 	@Nullable
 	private volatile Class<?> parameterType;
 
+	/**
+	 * 当前泛型参数类型
+	 */
 	@Nullable
 	private volatile Type genericParameterType;
 
+	/**
+	 * 当前参数的注解
+	 */
 	@Nullable
 	private volatile Annotation[] parameterAnnotations;
 
+	/**
+	 * 方法参数解析器
+	 */
 	@Nullable
 	private volatile ParameterNameDiscoverer parameterNameDiscoverer;
 
+	/**
+	 * 当前参数名
+	 */
 	@Nullable
 	private volatile String parameterName;
 
+	/**
+	 * 内嵌的方法参数
+	 */
 	@Nullable
 	private volatile MethodParameter nestedMethodParameter;
 
