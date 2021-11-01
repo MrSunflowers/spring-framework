@@ -51,7 +51,7 @@ public class UserA {
 		return userB;
 	}
 
-	public void setUserB(Optional<UserB> userB) {
+	public void setUserB(@Value("userB") Optional<UserB> userB) {
 		this.userB = userB;
 	}
 }

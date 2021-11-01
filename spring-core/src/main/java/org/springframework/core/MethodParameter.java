@@ -106,7 +106,7 @@ public class MethodParameter {
 	private volatile Type genericParameterType;
 
 	/**
-	 * 当前参数的注解
+	 * 当前索引{@link #parameterIndex}参数上的注解
 	 */
 	@Nullable
 	private volatile Annotation[] parameterAnnotations;
@@ -663,15 +663,21 @@ public class MethodParameter {
 	public Annotation[] getParameterAnnotations() {
 		Annotation[] paramAnns = this.parameterAnnotations;
 		if (paramAnns == null) {
+			//这里方法每个参数上可能有多个注解，所以返回二维数组
 			Annotation[][] annotationArray = this.executable.getParameterAnnotations();
+			//当前处理的参数索引
 			int index = this.parameterIndex;
+			// 如果当前方法是构造函数 且 声明该方法的类是内部类 且 注解数组长度 = 实际参数个数-1
 			if (this.executable instanceof Constructor &&
 					ClassUtils.isInnerClass(this.executable.getDeclaringClass()) &&
 					annotationArray.length == this.executable.getParameterCount() - 1) {
 				// Bug in javac in JDK <9: annotation array excludes enclosing instance parameter
 				// for inner classes, so access it with the actual parameter index lowered by 1
+				// JDK<9 中的 javac bug：注解数组不包含内部类的实例参数，所以以实际参数索引降低1的
+				// 的方式进行访问
 				index = this.parameterIndex - 1;
 			}
+			//这里 adaptAnnotationArray 是空实现，直接返回 annotationArray[index]
 			paramAnns = (index >= 0 && index < annotationArray.length ?
 					adaptAnnotationArray(annotationArray[index]) : EMPTY_ANNOTATION_ARRAY);
 			this.parameterAnnotations = paramAnns;

@@ -993,7 +993,17 @@ class ConstructorResolver {
 			throw ex;
 		}
 	}
-
+	/**
+	 * 设置新得当前注入点对象，返回旧的当前注入点对象
+	 * <ol>
+	 *  <li>从线程本地的当前注入点对象【currentInjectionPoint】中获取旧的InjectionPoint对象【变量 old】</li>
+	 *  <li>如果injectionPoint不为null,将injectionPoint设置到currentInjectionPoint;否则移除currentInjectionPoint
+	 *  所存储得InjectionPoint对象</li>
+	 *  <li>返回old</li>
+	 * </ol>
+	 * @param injectionPoint 新的注入点
+	 * @return 返回旧的当前注入点对象，如果没有返回null
+	 */
 	static InjectionPoint setCurrentInjectionPoint(@Nullable InjectionPoint injectionPoint) {
 		InjectionPoint old = currentInjectionPoint.get();
 		if (injectionPoint != null) {

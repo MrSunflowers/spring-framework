@@ -1332,14 +1332,15 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		InjectionPoint previousInjectionPoint = ConstructorResolver.setCurrentInjectionPoint(descriptor);
 		try {
-			//快速查找，AutowiredAnnotationBeanPostProcessor 增强器会用到，直接调用getBean()方法
+			//快速查找，AutowiredAnnotationBeanPostProcessor 增强器会用到，直接调用getBean()方法，其余情况直接返回null
 			Object shortcut = descriptor.resolveShortcut(this);
 			if (shortcut != null) {
 				return shortcut;
 			}
 			//获取被 Optional 包装的对象类型
 			Class<?> type = descriptor.getDependencyType();
-			//用于解析 @value 注解
+			//用于解析 @value 注解 QualifierAnnotationAutowireCandidateResolver 依然是在 <context:annotation-config/>
+			//	<context:component-scan base-package="org.springframework.myTest"/> 中注册
 			Object value = getAutowireCandidateResolver().getSuggestedValue(descriptor);
 			if (value != null) {
 				if (value instanceof String) {
