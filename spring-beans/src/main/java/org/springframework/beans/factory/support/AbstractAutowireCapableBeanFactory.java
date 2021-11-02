@@ -1535,7 +1535,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected void autowireByName(
 			String beanName, AbstractBeanDefinition mbd, BeanWrapper bw, MutablePropertyValues pvs) {
-		// 获取 bean 中需要自动装配的属性集合
+		// 返回需要自动注入的属性名数组
+		// 如果当前属性有 setter 方法且 该属性是可以被注入的 且 xml 中的 property 属性中没有配置该属性
+		// 且 该属性不是"简单值类型"，比如一些基本类型和基本类型的包装类型等
 		String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
 		// 遍历属性
 		for (String propertyName : propertyNames) {
@@ -1580,6 +1582,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		//存放所有候选Bean名的集合
 		Set<String> autowiredBeanNames = new LinkedHashSet<>(4);
+		// 返回需要自动注入的属性名数组
+		// 如果当前属性有 setter 方法且 该属性是可以被注入的 且 xml 中的 property 属性中没有配置该属性
+		// 且 该属性不是"简单值类型"，比如一些基本类型和基本类型的包装类型等
 		String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
 		//遍历需要自动注入的属性数组
 		for (String propertyName : propertyNames) {

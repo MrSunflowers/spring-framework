@@ -659,6 +659,7 @@ public class MethodParameter {
 
 	/**
 	 * Return the annotations associated with the specific method/constructor parameter.
+	 * <p>返回当前索引{@link #parameterIndex}参数上的注解数组</p>
 	 */
 	public Annotation[] getParameterAnnotations() {
 		Annotation[] paramAnns = this.parameterAnnotations;

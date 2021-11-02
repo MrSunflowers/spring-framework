@@ -1332,7 +1332,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		InjectionPoint previousInjectionPoint = ConstructorResolver.setCurrentInjectionPoint(descriptor);
 		try {
-			//快速查找，AutowiredAnnotationBeanPostProcessor 增强器会用到，直接调用getBean()方法，其余情况直接返回null
+			//1.快速查找，AutowiredAnnotationBeanPostProcessor 增强器会用到，直接调用getBean()方法，其余情况直接返回null
 			Object shortcut = descriptor.resolveShortcut(this);
 			if (shortcut != null) {
 				return shortcut;

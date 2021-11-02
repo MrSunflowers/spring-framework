@@ -129,6 +129,7 @@ public class InjectionPoint {
 			return fieldAnnotations;
 		}
 		else {
+			// 返回当前处理方法的索引处的参数的注解数组
 			return obtainMethodParameter().getParameterAnnotations();
 		}
 	}
