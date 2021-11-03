@@ -50,8 +50,8 @@ public class UserA {
 	public Optional<UserB> getUserB() {
 		return userB;
 	}
-
-	public void setUserB(@Value("userB") @Autowired Optional<UserB> userB) {
+	@Value("userB")
+	public void setUserB( Optional<UserB> userB) {
 		this.userB = userB;
 	}
 }

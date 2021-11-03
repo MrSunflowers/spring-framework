@@ -1302,7 +1302,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		descriptor.initParameterNameDiscovery(getParameterNameDiscoverer());
 		// 判断方法参数类型是否为 Optional 这里的 nestingLevel = 1 所以取 Optional 本身
 		if (Optional.class == descriptor.getDependencyType()) {
-			//1.如果需要注入的参数类型为 Optional 会返回用Optional包装好的对象(非懒加载)
+			//1.如果需要注入的参数类型为 Optional，则提供一个专门处理 Optional 的方法，
+			// 方法会返回用 Optional 包装好的被匹配到的 bean 实例(非懒加载)
 			return createOptionalDependency(descriptor, requestingBeanName);
 		}
 		//ObjectFactory 或 ObjectProvider 延迟加载的处理
@@ -1326,21 +1327,34 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 	}
 
+	/**
+	 * 匹配寻找自动注入的 bean
+	 * @param descriptor 自定义的注入描述
+	 * @param beanName
+	 * @param autowiredBeanNames
+	 * @param typeConverter
+	 * @return java.lang.Object
+	 */
 	@Nullable
 	public Object doResolveDependency(DependencyDescriptor descriptor, @Nullable String beanName,
 			@Nullable Set<String> autowiredBeanNames, @Nullable TypeConverter typeConverter) throws BeansException {
 
 		InjectionPoint previousInjectionPoint = ConstructorResolver.setCurrentInjectionPoint(descriptor);
 		try {
-			//1.快速查找，AutowiredAnnotationBeanPostProcessor 增强器会用到，直接调用getBean()方法，其余情况直接返回null
+			//1.快速查找，默认实现返回 null ，可由子类实现来提供一个快捷匹配 bean 的方法
 			Object shortcut = descriptor.resolveShortcut(this);
 			if (shortcut != null) {
 				return shortcut;
 			}
-			//获取被 Optional 包装的对象类型
+			// 当没有快捷匹配时，进入正常匹配流程
+			// 2.如果是被容器包裹的对象，则获取被包裹的对象类型，比如获取可能被 Optional 包装的对象类型
+			// 没有被包裹则直接获取需要注入的参数类型
 			Class<?> type = descriptor.getDependencyType();
-			//用于解析 @value 注解 QualifierAnnotationAutowireCandidateResolver 依然是在 <context:annotation-config/>
-			//	<context:component-scan base-package="org.springframework.myTest"/> 中注册
+			// 3. @value 注解处理
+			// 用于解析 @value 注解的 QualifierAnnotationAutowireCandidateResolver 依然是在
+			// <context:annotation-config/>
+			// <context:component-scan base-package="org.springframework.myTest"/> 中注册
+			// 3.1 获取方法或方法参数上可能存在的 @Value 注解的 value 值
 			Object value = getAutowireCandidateResolver().getSuggestedValue(descriptor);
 			if (value != null) {
 				if (value instanceof String) {
@@ -1855,7 +1869,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	 */
 	private Optional<?> createOptionalDependency(
 			DependencyDescriptor descriptor, @Nullable String beanName, final Object... args) {
-		//在这里将 nestingLevel ++ 所以一会通过 descriptor 取参数类型时取的是被 Optional 包装的对象
+		//在这里将 nestingLevel ++ 所以一会通过 descriptor 取参数类型时取到的就是被 Optional 包装的对象
 		DependencyDescriptor descriptorToUse = new NestedDependencyDescriptor(descriptor) {
 			@Override
 			public boolean isRequired() {
@@ -1867,6 +1881,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						super.resolveCandidate(beanName, requiredType, beanFactory));
 			}
 		};
+		//调用解析匹配方法
 		Object result = doResolveDependency(descriptorToUse, beanName, null, null);
 		return (result instanceof Optional ? (Optional<?>) result : Optional.ofNullable(result));
 	}
