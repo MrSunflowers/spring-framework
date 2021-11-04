@@ -1467,7 +1467,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		//获取自动装配方式( 就是xml中配置的 autowire 属性 )
 		int resolvedAutowireMode = mbd.getResolvedAutowireMode();
-		//2.按属性类型或是按属性名称
+		//2.按属性类型或是按属性名称自动注入
 		if (resolvedAutowireMode == AUTOWIRE_BY_NAME || resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
 			//创建一个新的 MutablePropertyValues 来存放 xml 中配置的 property 属性和解析到的需要自动注入的属性
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);

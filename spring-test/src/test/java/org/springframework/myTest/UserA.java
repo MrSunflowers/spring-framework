@@ -50,8 +50,8 @@ public class UserA {
 	public Optional<UserB> getUserB() {
 		return userB;
 	}
-	@Value("userB")
-	public void setUserB( Optional<UserB> userB) {
+	//@Value("${user.name}#{userB.name}")
+	public void setUserB(Optional<UserB> userB) {
 		this.userB = userB;
 	}
 }

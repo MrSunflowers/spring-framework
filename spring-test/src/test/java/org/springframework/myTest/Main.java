@@ -8,6 +8,7 @@ import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
+import org.springframework.context.expression.StandardBeanExpressionResolver;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -16,6 +17,7 @@ import org.springframework.myTest.factoryBeanTest.Blue;
 import org.springframework.myTest.factoryBeanTest.Car;
 import org.springframework.myTest.factoryBeanTest.Color;
 import org.springframework.myTest.factoryBeanTest.Red;
+import org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor;
 
 /**
  * @Description
@@ -29,6 +31,10 @@ public class Main {
 	public static void main(String[] args) {
 		/*Resource resource = new ClassPathResource("myTestResources/applicationContext.xml");
 		XmlBeanFactory beanFactory = new XmlBeanFactory(resource);
+		beanFactory.addBeanPostProcessor(new AutowiredAnnotationBeanPostProcessor());
+		beanFactory.addBeanPostProcessor(new CommonAnnotationBeanPostProcessor());
+		beanFactory.addBeanPostProcessor(new PersistenceAnnotationBeanPostProcessor());
+		beanFactory.setBeanExpressionResolver(new StandardBeanExpressionResolver(beanFactory.getBeanClassLoader()));
 		earlySingletonTest(beanFactory);*/
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
 		UserA userA = (UserA)context.getBean("userA");

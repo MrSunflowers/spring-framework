@@ -952,6 +952,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		}
 		String result = value;
 		for (StringValueResolver resolver : this.embeddedValueResolvers) {
+			//解析value中可能含有的占位符
 			result = resolver.resolveStringValue(result);
 			if (result == null) {
 				return null;
