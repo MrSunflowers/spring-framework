@@ -11,7 +11,7 @@ import org.springframework.test.web.reactive.server.samples.ExchangeMutatorTests
  * @Date 2021/6/21
  */
 public class UserB implements TestUser {
-	private String name = "testName";
+	private String name;
 	private int age;
 	private int email;
 	private UserA userA;

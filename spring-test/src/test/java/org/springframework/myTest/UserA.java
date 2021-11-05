@@ -20,7 +20,7 @@ public class UserA {
 	private String name;
 	private int age;
 	private int email;
-	private Optional<UserB> userB;
+	private UserB userB;
 
 
 
@@ -47,11 +47,11 @@ public class UserA {
 		this.email = email;
 	}
 
-	public Optional<UserB> getUserB() {
+	public UserB getUserB() {
 		return userB;
 	}
-	//@Value("${user.name}#{userB.name}")
-	public void setUserB(Optional<UserB> userB) {
+
+	public void setUserB(UserB userB) {
 		this.userB = userB;
 	}
 }
