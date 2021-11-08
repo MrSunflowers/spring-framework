@@ -65,8 +65,8 @@ public class Main {
 	private static void earlySingletonTest(XmlBeanFactory beanFactory) {
 		UserA userA = (UserA)beanFactory.getBean("userA");
 		UserB userB = (UserB)beanFactory.getBean("userB");
-		/*System.out.println(userA.getUserB().equals(userB));
-		System.out.println(userB.getUserA().equals(userA));*/
+		System.out.println(userA.getUserB().equals(userB));
+		System.out.println(userB.getUserA().equals(userA));
 	}
 
 

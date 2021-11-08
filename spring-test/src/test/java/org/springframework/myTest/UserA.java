@@ -2,11 +2,13 @@ package org.springframework.myTest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.myTest.testType.TestType;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -21,8 +23,15 @@ public class UserA {
 	private int age;
 	private int email;
 	private UserB userB;
+	private List<TestType> testType1;
 
+	public List<TestType> getTestType1() {
+		return testType1;
+	}
 
+	public void setTestType1(List<TestType> testType1) {
+		this.testType1 = testType1;
+	}
 
 	public String getName() {
 		return name;

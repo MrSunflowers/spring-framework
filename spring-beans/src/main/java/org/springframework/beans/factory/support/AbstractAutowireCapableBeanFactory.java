@@ -613,10 +613,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Eagerly cache singletons to be able to resolve circular references
 		// even when triggered by lifecycle interfaces like BeanFactoryAware.
-		// 3. 检测循环依赖并尝试解决
+		// 3. 循环依赖 -- 记录早期的 bean
 		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
 				isSingletonCurrentlyInCreation(beanName));
-		//当前bean是单例且尝试自动处理循环依赖且当前bean正在创建
+		//当前bean是单例且需要自动处理循环依赖且当前bean正在创建
 		//在 Spring 中，会有一个个专门的属性默认为 DefaultSingletonBeanRegistry 的 singletonsCurrentlyInCreation
 		//来记录 bean 的加载状态，在 bean 开始创建前会将 beanName 记录在属性中，在 bean 创建结束后会将 beanName 从属性中移除。
 		if (earlySingletonExposure) {
@@ -1462,26 +1462,29 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
-		//获取 xml 中配置的 property 属性
+		// 下面正式开始属性填充
+		// 这里获取的是已经解析过的属性，就是前面 xml 解析的 property 属性参数
 		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
 
-		//获取自动装配方式( 就是xml中配置的 autowire 属性 )
 		int resolvedAutowireMode = mbd.getResolvedAutowireMode();
-		// 2. 按属性类型或是按属性名称自动注入
+		// 2 扫描获取自动装配属性
+		// 这里的自动装配是指在当前 bean 中的有 setter 方法的
+		// 且 xml 中的 property 属性中没有配置的属性，因为上面的 pvs 中已经包含了 xml 中的 property 属性
+		// 按属性类型或是按属性名称获取
 		if (resolvedAutowireMode == AUTOWIRE_BY_NAME || resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
-			//创建一个新的 MutablePropertyValues 来存放 xml 中配置的 property 属性和解析到的需要自动注入的属性
+			// 构造一个新的 MutablePropertyValues 来存放前面获取的属性和即将扫描到的需要自动装配的属性
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
 			// Add property values based on autowire by name if applicable.
-			// 按名称注入
+			// 按属性名称的属性获取
 			if (resolvedAutowireMode == AUTOWIRE_BY_NAME) {
 				autowireByName(beanName, mbd, bw, newPvs);
 			}
 			// Add property values based on autowire by type if applicable.
-			// 按类型注入
+			// 按属性类型的属性获取
 			if (resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
 				autowireByType(beanName, mbd, bw, newPvs);
 			}
-			// 现在 pvs 中已经包含被注入的属性参数了
+			// 现在 pvs 中已经包含需要自动装配的属性参数了
 			pvs = newPvs;
 		}
 
@@ -1489,7 +1492,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		boolean needsDepCheck = (mbd.getDependencyCheck() != AbstractBeanDefinition.DEPENDENCY_CHECK_NONE);
 
 		PropertyDescriptor[] filteredPds = null;
-		// 3. 增强处理
+		// 3. 对上面获取的参数做进一步处理，比如增加注解属性参数
 		if (hasInstAwareBpps) {
 			if (pvs == null) {
 				pvs = mbd.getPropertyValues();
@@ -1500,12 +1503,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					if (filteredPds == null) {
 						filteredPds = filterPropertyDescriptorsForDependencyCheck(bw, mbd.allowCaching);
 					}
-					//对所有需要依赖检查的属性进行后处理
 					pvsToUse = bp.postProcessPropertyValues(pvs, filteredPds, bw.getWrappedInstance(), beanName);
 					if (pvsToUse == null) {
 						return;
 					}
 				}
+				// 现在参数中已经包含注解标注的属性参数了
 				pvs = pvsToUse;
 			}
 		}
@@ -1519,7 +1522,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		if (pvs != null) {
-			//5.将属性应用到bean中
+			//5.将属性参数应用到bean中
 			applyPropertyValues(beanName, mbd, bw, pvs);
 		}
 	}
@@ -1537,7 +1540,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected void autowireByName(
 			String beanName, AbstractBeanDefinition mbd, BeanWrapper bw, MutablePropertyValues pvs) {
 		// 返回需要自动注入的属性名数组
-		// 如果当前属性有 setter 方法且 该属性是可以被注入的 且 xml 中的 property 属性中没有配置该属性
+		// 如果当前属性有 setter 方法且 该属性是可以被注入的 且 pvs中没有配置该属性
 		// 且 该属性不是"简单值类型"，比如一些基本类型和基本类型的包装类型等
 		String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
 		// 遍历属性
@@ -1581,38 +1584,42 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			//没有就使用 BeanWrapper 来充当默认的类型转换器
 			converter = bw;
 		}
-		// 对集合类型注入的支持，用来记录集合中所有依赖的 bean
+		// 提供对集合类型参数自动装配的支持，用来记录集合中所有依赖的 bean
 		Set<String> autowiredBeanNames = new LinkedHashSet<>(4);
-		// 1. 获取需要自动注入的属性名数组
-		// 如果当前属性有 setter 方法且 该属性是可以被注入的 且 xml 中的 property 属性中没有配置该属性
+		// 1. 获取需要自动装配的属性名数组
+		// 如果当前属性有 setter 方法且 该属性是可以被注入的 且 当前 pvs 中没有该属性
 		// 且 该属性不是"简单值类型"，比如一些基本类型和基本类型的包装类型等
 		String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
 		// 2. 遍历需要自动注入的属性数组
 		for (String propertyName : propertyNames) {
 			try {
+				// 2.1 从 BeanWrapper 中获取该属性的属性描述符
 				PropertyDescriptor pd = bw.getPropertyDescriptor(propertyName);
 				// Don't try autowiring by type for type Object: never makes sense,
 				// even if it technically is a unsatisfied, non-simple property.
-				// 不要尝试按类型为 Object 类型自动装配：永远没有意义，即使它在技术上是一个不满意的、非简单的属性。
+				// 不要尝试按类型为 Object 类型自动装配：永远没有意义，即使它在技术上是一个 "非简单" 的属性。
 				if (Object.class != pd.getPropertyType()) {
-					//获取属性的 Setter 方法的包装对象
+					// 获取该属性对应的 Setter 方法的方法描述
 					MethodParameter methodParam = BeanUtils.getWriteMethodParameter(pd);
 					// Do not allow eager init for type matching in case of a prioritized post-processor.
 					// 判断当前被注入的 bean 对象是否是 PriorityOrder 实例，如果是就不允许急于初始化来进行类型匹配。
 					boolean eager = !(bw.getWrappedInstance() instanceof PriorityOrdered);
-					// 在使用 AutowireByTypeDependencyDescriptor 寻找合适的setter方法进行属性注入时，从不考虑参数名称
-					// 就是使用 byType 的形式的自动装配，当此 Type 的 Bean 有多个时，
-					// 将会直接抛出错误，而不是再根据参数的 Name 去匹配第二遍
-					// 将属性的 setter 方法和属性的类型等信息封装成为一个 DependencyDescriptor
+
+					// ？在使用 AutowireByTypeDependencyDescriptor 寻找合适的setter方法进行属性注入时，从不考虑参数名称
+					// ？就是使用 byType 的形式的自动装配，当此 Type 的 Bean 有多个时，
+					// ？将会直接抛出错误，而不是再根据参数的 Name 去匹配第二遍
+
+					// 将属性的 setter 方法封装成为一个 DependencyDescriptor，其中包括包装函数参数、方法参数或字段等信息
 					// 这个对象非常重要，是依赖注入场景中的非常核心的对象
 					DependencyDescriptor desc = new AutowireByTypeDependencyDescriptor(methodParam, eager);
-					// 3. 根据类型查找依赖，是 Spring 进行依赖查找的核心方法
-					//  用封装的 DependencyDescriptor 匹配 Bean 对象
+
+					// 3. resolveDependency 方法根据类型查找依赖，是 Spring 进行依赖查找的核心方法
 					Object autowiredArgument = resolveDependency(desc, beanName, autowiredBeanNames, converter);
 					if (autowiredArgument != null) {
+						// 将匹配到的 bean 加入 pvs
 						pvs.add(propertyName, autowiredArgument);
 					}
-					// 注册集合类的依赖的 bean
+					// 4. 注册集合类型参数依赖的 bean
 					for (String autowiredBeanName : autowiredBeanNames) {
 						registerDependentBean(autowiredBeanName, beanName);
 						if (logger.isTraceEnabled()) {
@@ -1642,7 +1649,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected String[] unsatisfiedNonSimpleProperties(AbstractBeanDefinition mbd, BeanWrapper bw) {
 		Set<String> result = new TreeSet<>();
-		//获取 BeanDefinition 中存储的所有属性值 ( xml中配置的 property )
+		//获取 BeanDefinition 中存储的所有属性值
 		PropertyValues pvs = mbd.getPropertyValues();
 		//PropertyDescriptor类：(属性描述器)
 		//　　PropertyDescriptor类表示JavaBean类通过存储器导出一个属性。主要方法：
@@ -1663,7 +1670,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		PropertyDescriptor[] pds = bw.getPropertyDescriptors();
 		//遍历 bean 中的所有属性
 		for (PropertyDescriptor pd : pds) {
-			// 如果当前属性有 setter 方法且 该属性是可以被注入的 且 xml 中的 property 属性中没有配置该属性
+			// 如果当前属性有 setter 方法且 该属性是可以被注入的 且 当前 pvs 没有该属性
 			// 且 该属性不是"简单值类型"，比如一些基本类型和基本类型的包装类型等
 			if (pd.getWriteMethod() != null && !isExcludedFromDependencyCheck(pd) && !pvs.contains(pd.getName()) &&
 					!BeanUtils.isSimpleProperty(pd.getPropertyType())) {

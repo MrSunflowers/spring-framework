@@ -274,9 +274,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
 			// 4. 创建实例前的准备
-			// 只有在单例情况下，Spring 才会尝试解决循环依赖问题
+			// 如果指定的 bean 是 prototype 作用域的并且正在创建中则返回 true
 			if (isPrototypeCurrentlyInCreation(beanName)) {
-				// 多例情况下的循环依赖情况
+				// 循环依赖 -- 多例检测
 				throw new BeanCurrentlyInCreationException(beanName);
 			}
 
