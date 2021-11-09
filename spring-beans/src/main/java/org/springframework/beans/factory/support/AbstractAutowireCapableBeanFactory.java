@@ -1492,7 +1492,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		boolean needsDepCheck = (mbd.getDependencyCheck() != AbstractBeanDefinition.DEPENDENCY_CHECK_NONE);
 
 		PropertyDescriptor[] filteredPds = null;
-		// 3. 对上面获取的参数做进一步处理，比如增加注解属性参数
+		// 3. 注解注入处理
 		if (hasInstAwareBpps) {
 			if (pvs == null) {
 				pvs = mbd.getPropertyValues();
@@ -1501,23 +1501,25 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				PropertyValues pvsToUse = bp.postProcessProperties(pvs, bw.getWrappedInstance(), beanName);
 				if (pvsToUse == null) {
 					if (filteredPds == null) {
+						// 获取 bean 中所有属性描述，除了被排除或忽略的
 						filteredPds = filterPropertyDescriptorsForDependencyCheck(bw, mbd.allowCaching);
 					}
+					// 验证属性是否已经全部解析完成
 					pvsToUse = bp.postProcessPropertyValues(pvs, filteredPds, bw.getWrappedInstance(), beanName);
 					if (pvsToUse == null) {
 						return;
 					}
 				}
-				// 现在参数中已经包含注解标注的属性参数了
 				pvs = pvsToUse;
 			}
 		}
 		// 4. 依赖检查
 		if (needsDepCheck) {
 			if (filteredPds == null) {
+				// 获取 bean 中所有属性描述，除了被排除或忽略的
 				filteredPds = filterPropertyDescriptorsForDependencyCheck(bw, mbd.allowCaching);
 			}
-			//4.依赖检查，对应depends-on属性，3.0已经弃用此属性
+			// 依赖检查，对应 depends-on 属性，用来表示一个bean A的实例化依赖另一个bean B的实例化
 			checkDependencies(beanName, mbd, filteredPds, pvs);
 		}
 
@@ -1749,12 +1751,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			String beanName, AbstractBeanDefinition mbd, PropertyDescriptor[] pds, @Nullable PropertyValues pvs)
 			throws UnsatisfiedDependencyException {
 
+		// 依赖检查的模式
 		int dependencyCheck = mbd.getDependencyCheck();
+
 		for (PropertyDescriptor pd : pds) {
+			// 检查属性中有setter方法的、pvs中不存在的属性
 			if (pd.getWriteMethod() != null && (pvs == null || !pvs.contains(pd.getName()))) {
+				// 是否是"简单"属性
 				boolean isSimple = BeanUtils.isSimpleProperty(pd.getPropertyType());
+				// 检查所有属性
 				boolean unsatisfied = (dependencyCheck == AbstractBeanDefinition.DEPENDENCY_CHECK_ALL) ||
+						// 检查"简单"属性
 						(isSimple && dependencyCheck == AbstractBeanDefinition.DEPENDENCY_CHECK_SIMPLE) ||
+						// 检查“非简单”对象属性
 						(!isSimple && dependencyCheck == AbstractBeanDefinition.DEPENDENCY_CHECK_OBJECTS);
 				if (unsatisfied) {
 					throw new UnsatisfiedDependencyException(mbd.getResourceDescription(), beanName, pd.getName(),

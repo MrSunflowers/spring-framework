@@ -63,10 +63,12 @@ public class Main {
 	 * author: lyk <br>
 	 */
 	private static void earlySingletonTest(XmlBeanFactory beanFactory) {
+		AutowiredAnnotationBeanPostProcessor autowiredAnnotationBeanPostProcessor = new AutowiredAnnotationBeanPostProcessor();
+		autowiredAnnotationBeanPostProcessor.setBeanFactory(beanFactory);
+		beanFactory.addBeanPostProcessor(autowiredAnnotationBeanPostProcessor);
 		UserA userA = (UserA)beanFactory.getBean("userA");
 		UserB userB = (UserB)beanFactory.getBean("userB");
-		System.out.println(userA.getUserB().equals(userB));
-		System.out.println(userB.getUserA().equals(userA));
+		//System.out.println(userB.getUserA().equals(userA));
 	}
 
 

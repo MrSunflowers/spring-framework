@@ -446,6 +446,7 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 
 	@Override
 	public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) {
+		// 判断是否需要重新扫描注解
 		InjectionMetadata metadata = findAutowiringMetadata(beanName, bean.getClass(), pvs);
 		try {
 			metadata.inject(bean, beanName, pvs);
@@ -695,12 +696,14 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 		protected void inject(Object bean, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable {
 			Field field = (Field) this.member;
 			Object value;
+			// 有缓存则获取缓存方法参数或字段值去解析
 			if (this.cached) {
 				try {
 					value = resolvedCachedArgument(beanName, this.cachedFieldValue);
 				}
 				catch (NoSuchBeanDefinitionException ex) {
 					// Unexpected removal of target bean for cached argument -> re-resolve
+					// 意外删除了缓存参数的目标 bean -> 重新解析
 					value = resolveFieldValue(field, bean, beanName);
 				}
 			}
@@ -708,25 +711,31 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 				value = resolveFieldValue(field, bean, beanName);
 			}
 			if (value != null) {
+				// 判断字段是否可写
 				ReflectionUtils.makeAccessible(field);
+				// 为字段写入值
 				field.set(bean, value);
 			}
 		}
 
 		@Nullable
 		private Object resolveFieldValue(Field field, Object bean, @Nullable String beanName) {
+			// 封装 @Autowired 的参数
 			DependencyDescriptor desc = new DependencyDescriptor(field, this.required);
 			desc.setContainingClass(bean.getClass());
+			// 一样用来记录集合中所有依赖的 bean
 			Set<String> autowiredBeanNames = new LinkedHashSet<>(1);
 			Assert.state(beanFactory != null, "No BeanFactory available");
 			TypeConverter typeConverter = beanFactory.getTypeConverter();
 			Object value;
 			try {
+				// 根据类型查找依赖的 bean
 				value = beanFactory.resolveDependency(desc, beanName, autowiredBeanNames, typeConverter);
 			}
 			catch (BeansException ex) {
 				throw new UnsatisfiedDependencyException(null, beanName, new InjectionPoint(field), ex);
 			}
+			// 加入缓存
 			synchronized (this) {
 				if (!this.cached) {
 					Object cachedFieldValue = null;
@@ -781,15 +790,18 @@ public class AutowiredAnnotationBeanPostProcessor implements SmartInstantiationA
 				}
 				catch (NoSuchBeanDefinitionException ex) {
 					// Unexpected removal of target bean for cached argument -> re-resolve
+					// 意外删除了缓存，重新根据 Method 解析参数
 					arguments = resolveMethodArguments(method, bean, beanName);
 				}
 			}
 			else {
+				// 根据 Method 解析参数
 				arguments = resolveMethodArguments(method, bean, beanName);
 			}
 			if (arguments != null) {
 				try {
 					ReflectionUtils.makeAccessible(method);
+					// 反射调用方法
 					method.invoke(bean, arguments);
 				}
 				catch (InvocationTargetException ex) {

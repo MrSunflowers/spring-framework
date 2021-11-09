@@ -2,6 +2,7 @@ package org.springframework.myTest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.myTest.testType.TestType;
 import org.springframework.stereotype.Component;
 
@@ -11,27 +12,20 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * @Description
- * @Author lyk
- * @Version V1.0.0
- * @Since 1.0
- * @Date 2021/6/21
- */
 public class UserA {
 	private String name;
 	private int age;
 	private int email;
-	private UserB userB;
-	private List<TestType> testType1;
+	/*private UserB userB;*/
+	//private List<TestType> testType1;
 
-	public List<TestType> getTestType1() {
+	/*public List<TestType> getTestType1() {
 		return testType1;
 	}
 
 	public void setTestType1(List<TestType> testType1) {
 		this.testType1 = testType1;
-	}
+	}*/
 
 	public String getName() {
 		return name;
@@ -56,11 +50,4 @@ public class UserA {
 		this.email = email;
 	}
 
-	public UserB getUserB() {
-		return userB;
-	}
-
-	public void setUserB(UserB userB) {
-		this.userB = userB;
-	}
 }

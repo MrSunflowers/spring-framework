@@ -1415,6 +1415,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 
 			// 4. 查找与所需类型匹配的 bean 实例 (可能有多个匹配)
+			// matchingBeans：key = beanName，value = 对应的 bean 实例
 			Map<String, Object> matchingBeans = findAutowireCandidates(beanName, type, descriptor);
 			if (matchingBeans.isEmpty()) {
 				// 如果没找到，是必须注入则报错，否则返回 null
@@ -1423,12 +1424,14 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 				return null;
 			}
-
+			// 候选 bean 名称
 			String autowiredBeanName;
+			// 候选 bean 实例
 			Object instanceCandidate;
 
 			// 如果匹配到多个
 			if (matchingBeans.size() > 1) {
+				// 确定给定 bean 集合中的自动装配的唯一候选者名称
 				autowiredBeanName = determineAutowireCandidate(matchingBeans, descriptor);
 				if (autowiredBeanName == null) {
 					if (isRequired(descriptor) || !indicatesMultipleBeans(type)) {

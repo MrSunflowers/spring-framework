@@ -14,7 +14,7 @@ public class UserB{
 	private String name;
 	private int age;
 	private int email;
-	private UserA userA;
+	//private UserA userA;
 
 	public String getName() {
 		return name;
@@ -40,12 +40,12 @@ public class UserB{
 		this.email = email;
 	}
 
-	public UserA getUserA() {
+	/*public UserA getUserA() {
 		return userA;
 	}
 
 	public void setUserA(UserA userA) {
 		this.userA = userA;
-	}
+	}*/
 
 }

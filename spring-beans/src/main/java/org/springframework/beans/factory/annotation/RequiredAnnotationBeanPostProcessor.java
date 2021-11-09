@@ -148,8 +148,10 @@ public class RequiredAnnotationBeanPostProcessor implements SmartInstantiationAw
 
 		if (!this.validatedBeanNames.contains(beanName)) {
 			if (!shouldSkip(this.beanFactory, beanName)) {
+				// 未通过验证的属性
 				List<String> invalidProperties = new ArrayList<>();
 				for (PropertyDescriptor pd : pds) {
+					//该属性是否必须有值且前面未解析
 					if (isRequiredProperty(pd) && !pvs.contains(pd.getName())) {
 						invalidProperties.add(pd.getName());
 					}
@@ -158,6 +160,7 @@ public class RequiredAnnotationBeanPostProcessor implements SmartInstantiationAw
 					throw new BeanInitializationException(buildExceptionMessage(invalidProperties, beanName));
 				}
 			}
+			//存储验证完毕的 beanName
 			this.validatedBeanNames.add(beanName);
 		}
 		return pvs;
@@ -179,9 +182,11 @@ public class RequiredAnnotationBeanPostProcessor implements SmartInstantiationAw
 			return false;
 		}
 		BeanDefinition beanDefinition = beanFactory.getBeanDefinition(beanName);
+		// 1.beanName 对应的 bean 由工厂 bean 创建，跳过属性检查
 		if (beanDefinition.getFactoryBeanName() != null) {
 			return true;
 		}
+		// 2.手动设置跳过属性检查
 		Object value = beanDefinition.getAttribute(SKIP_REQUIRED_CHECK_ATTRIBUTE);
 		return (value != null && (Boolean.TRUE.equals(value) || Boolean.parseBoolean(value.toString())));
 	}
