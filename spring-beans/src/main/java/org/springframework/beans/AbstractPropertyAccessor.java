@@ -96,26 +96,35 @@ public abstract class AbstractPropertyAccessor extends TypeConverterSupport impl
 			this.suppressNotWritablePropertyException = true;
 		}
 		try {
+			// 遍历属性列表并设置值
 			for (PropertyValue pv : propertyValues) {
 				// setPropertyValue may throw any BeansException, which won't be caught
 				// here, if there is a critical failure such as no matching field.
 				// We can attempt to deal only with less serious exceptions.
+				// setPropertyValue 可能会抛出任何 BeansException，如果没有匹配字段失败这种严重错误，则不会在此处捕获。
+				// 我们只能尝试处理不太严重的异常。
 				try {
 					setPropertyValue(pv);
 				}
 				catch (NotWritablePropertyException ex) {
+					// 尝试设置不可写的属性值时抛出的异常（通常是因为没有 setter 方法）
+					// 我们是否应该忽略未知属性（在 bean 中找不到）
 					if (!ignoreUnknown) {
 						throw ex;
 					}
 					// Otherwise, just ignore it and continue...
+					// 否则忽略并继续
 				}
 				catch (NullValueInNestedPathException ex) {
+					// 当嵌套路径中有空值时抛出的异常例如 user.name user 为 null
+					// 我们是否应该忽略无效属性（找到但不可访问）
 					if (!ignoreInvalid) {
 						throw ex;
 					}
 					// Otherwise, just ignore it and continue...
 				}
 				catch (PropertyAccessException ex) {
+					// 与属性访问相关的异常，例如类型不匹配或调用目标异常。
 					if (propertyAccessExceptions == null) {
 						propertyAccessExceptions = new ArrayList<>();
 					}
@@ -130,6 +139,7 @@ public abstract class AbstractPropertyAccessor extends TypeConverterSupport impl
 		}
 
 		// If we encountered individual exceptions, throw the composite exception.
+		// 如果我们遇到个别异常，则抛出复合异常
 		if (propertyAccessExceptions != null) {
 			PropertyAccessException[] paeArray = propertyAccessExceptions.toArray(new PropertyAccessException[0]);
 			throw new PropertyBatchUpdateException(paeArray);

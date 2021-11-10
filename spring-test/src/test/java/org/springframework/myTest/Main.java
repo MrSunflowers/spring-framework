@@ -4,7 +4,9 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
@@ -12,6 +14,7 @@ import org.springframework.context.expression.StandardBeanExpressionResolver;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.myTest.AutowiredAnnotationBeanPostProcessorTest.AutowiredAnnotationBeanPostProcessorTest;
 import org.springframework.myTest.CreateBeanTest.CreateBeanTestBean;
 import org.springframework.myTest.factoryBeanTest.Blue;
 import org.springframework.myTest.factoryBeanTest.Car;
@@ -29,12 +32,12 @@ import org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcesso
 public class Main {
 
 	public static void main(String[] args) {
-		Resource resource = new ClassPathResource("myTestResources/applicationContext.xml");
+		/*Resource resource = new ClassPathResource("myTestResources/applicationContext.xml");
 		XmlBeanFactory beanFactory = new XmlBeanFactory(resource);
-		earlySingletonTest(beanFactory);
-		/*ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
+		earlySingletonTest(beanFactory);*/
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
 		UserA userA = (UserA)context.getBean("userA");
-		UserB userB = (UserB)context.getBean("userB");*/
+		UserB userB = (UserB)context.getBean("userB");
 		//System.out.println(userA.getUserB().equals(userB));
 		//System.out.println(userB.getUserA().equals(userA));
 		/*AnnotationConfigApplicationContext classPathXmlApplicationContext = new AnnotationConfigApplicationContext("org/springframework/myTest");
@@ -66,6 +69,10 @@ public class Main {
 		AutowiredAnnotationBeanPostProcessor autowiredAnnotationBeanPostProcessor = new AutowiredAnnotationBeanPostProcessor();
 		autowiredAnnotationBeanPostProcessor.setBeanFactory(beanFactory);
 		beanFactory.addBeanPostProcessor(autowiredAnnotationBeanPostProcessor);
+		/*BeanDefinition userA1 = beanFactory.getBeanDefinition("userA");
+		if(userA1 instanceof GenericBeanDefinition){
+			((GenericBeanDefinition)userA1).setDependencyCheck(AbstractBeanDefinition.DEPENDENCY_CHECK_ALL);
+		}*/
 		UserA userA = (UserA)beanFactory.getBean("userA");
 		UserB userB = (UserB)beanFactory.getBean("userB");
 		//System.out.println(userB.getUserA().equals(userA));

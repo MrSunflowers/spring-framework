@@ -11,12 +11,20 @@ import org.springframework.test.web.reactive.server.samples.ExchangeMutatorTests
  * @Date 2021/6/21
  */
 public class UserB{
-	private String name;
+	private String name = "qwe";
 	private int age;
 	private int email;
-	//private UserA userA;
 
 	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	//private UserA userA;
+
+	/*public String getName() {
 		return name;
 	}
 
@@ -38,7 +46,7 @@ public class UserB{
 
 	public void setEmail(int email) {
 		this.email = email;
-	}
+	}*/
 
 	/*public UserA getUserA() {
 		return userA;

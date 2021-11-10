@@ -1679,15 +1679,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	@Nullable
 	protected Object evaluateBeanDefinitionString(@Nullable String value, @Nullable BeanDefinition beanDefinition) {
-		// 如果该工厂没有设置 bean 定义值中表达式的解析策略
 		if (this.beanExpressionResolver == null) {
-			//直接返回要检查的值
 			return value;
 		}
 
 		Scope scope = null;
 		if (beanDefinition != null) {
-			//获取值所来自的bean定义的当前目标作用域
 			String scopeName = beanDefinition.getScope();
 			if (scopeName != null) {
 				scope = getRegisteredScope(scopeName);

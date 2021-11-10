@@ -148,10 +148,10 @@ public class RequiredAnnotationBeanPostProcessor implements SmartInstantiationAw
 
 		if (!this.validatedBeanNames.contains(beanName)) {
 			if (!shouldSkip(this.beanFactory, beanName)) {
-				// 未通过验证的属性
+				// 记录未通过验证的属性
 				List<String> invalidProperties = new ArrayList<>();
 				for (PropertyDescriptor pd : pds) {
-					//该属性是否必须有值且前面未解析
+					//该属性的setter方法上是否贴有 @Required 且 pvs 中不存在
 					if (isRequiredProperty(pd) && !pvs.contains(pd.getName())) {
 						invalidProperties.add(pd.getName());
 					}
