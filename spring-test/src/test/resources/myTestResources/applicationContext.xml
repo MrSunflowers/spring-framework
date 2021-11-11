@@ -16,16 +16,12 @@
 	<!--<myname:userA id="userA" name="username" age="18" email="12345875" />-->
 
 	<!--循环依赖-->
-	<bean name="userA" class="org.springframework.myTest.UserA" autowire="byType"  >
-		<property name="email" value="456" />
-		<property name="name" value="#{userB.name}" />
+	<bean name="userA" class="org.springframework.myTest.UserA" autowire="byType"  />
+	<bean name="userB" class="org.springframework.myTest.UserB" autowire="byType" />
+	<!--<bean name="testType1" class="org.springframework.myTest.testType.TestType1"/>
+	<bean name="testType2" class="org.springframework.myTest.testType.TestType2"/>-->
 
-	</bean>
-
-	<bean name="testType1" class="org.springframework.myTest.testType.TestType1"/>
-	<!--<bean name="testType2" class="org.springframework.myTest.testType.TestType2"/>-->
-	<bean name="userB" class="org.springframework.myTest.UserB" />
-
+	<!--<bean name="awareTestBean" class="org.springframework.myTest.AwareTest.AwareTestBean" />-->
 
 
 	<!--colorFactory begin-->

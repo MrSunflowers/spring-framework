@@ -17,12 +17,8 @@ import java.util.Optional;
 public class UserA {
 	private String name;
 	private int age;
-	@Value("187")
 	private int email;
-	@Autowired
 	private UserB userB;
-	private TestType1 testType1;
-	private TestType2 testType2;
 
 	//private List<TestType> testType1;
 
@@ -34,21 +30,6 @@ public class UserA {
 		this.testType1 = testType1;
 	}*/
 
-	public TestType2 getTestType2() {
-		return testType2;
-	}
-
-	public void setTestType2(TestType2 testType2) {
-		this.testType2 = testType2;
-	}
-
-	public TestType1 getTestType1() {
-		return testType1;
-	}
-
-	public void setTestType1(TestType1 testType1) {
-		this.testType1 = testType1;
-	}
 
 	public UserB getUserB() {
 		return userB;
