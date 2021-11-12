@@ -367,10 +367,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					// 5.2 多例 bean 的创建，直接 new 一个
 					Object prototypeInstance = null;
 					try {
+						// 创建 bean 之前的回调，默认实现将 bean 设置为正在创建
 						beforePrototypeCreation(beanName);
 						prototypeInstance = createBean(beanName, mbd, args);
 					}
 					finally {
+						// 创建 bean 之后的回调，默认实现将 bean 从正在创建中移除
 						afterPrototypeCreation(beanName);
 					}
 					beanInstance = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);
