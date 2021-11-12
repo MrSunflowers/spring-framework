@@ -547,42 +547,55 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			StartupStep contextRefresh = this.applicationStartup.start("spring.context.refresh");
 
 			// Prepare this context for refreshing.
+			// 1. 刷新前的准备工作
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
+			// 2. 初始化 BeanFactory 并进行 xml 文件读取
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
+			// 3. 为 BeanFactory 填充各种功能
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
+				// 4. 用于预留给某些 ApplicationContext 特殊实现中为 BeanFactory 注册特殊的 BeanPostProcessor 等
 				postProcessBeanFactory(beanFactory);
 
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
+
 				// Invoke factory processors registered as beans in the context.
+				// 5. 激活各种 BeanFactory 增强器
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
+				// 6. 注册各种针对 bean 创建时使用的增强器
 				registerBeanPostProcessors(beanFactory);
 				beanPostProcess.end();
 
 				// Initialize message source for this context.
+				// 7. 为环境初始化不同的语言环境，即国际化处理
 				initMessageSource();
 
 				// Initialize event multicaster for this context.
+				// 8. 初始化消息广播器
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
+				// 9. 预留给特殊的子类拓展
 				onRefresh();
 
 				// Check for listener beans and register them.
+				// 10. 在所有注册的 bean 中查找 listener bean 并注册
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
+				// 11. 实例化所有非懒加载的单例 bean
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
+				// 12. 完成刷新，通知生命周期处理器刷新容器
 				finishRefresh();
 			}
 
@@ -631,10 +644,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Initialize any placeholder property sources in the context environment.
+		// 1. 预留给子类用于在初始化时对系统属性可以额外处理
 		initPropertySources();
 
 		// Validate that all properties marked as required are resolvable:
 		// see ConfigurablePropertyResolver#setRequiredProperties
+		// 2. 验证所有必须的属性是否都已经正确加载
 		getEnvironment().validateRequiredProperties();
 
 		// Store pre-refresh ApplicationListeners...
@@ -668,7 +683,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see #getBeanFactory()
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
+		// 1. 初始化 BeanFactory，并进行文件读取
 		refreshBeanFactory();
+		// 2. 返回当前的 BeanFactory
 		return getBeanFactory();
 	}
 

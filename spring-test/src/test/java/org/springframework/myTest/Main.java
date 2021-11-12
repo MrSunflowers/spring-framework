@@ -33,15 +33,15 @@ import org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcesso
 public class Main {
 
 	public static void main(String[] args) {
-		Resource resource = new ClassPathResource("myTestResources/applicationContext.xml");
+		/*Resource resource = new ClassPathResource("myTestResources/applicationContext.xml");
 		XmlBeanFactory beanFactory = new XmlBeanFactory(resource);
-		earlySingletonTest(beanFactory);
+		earlySingletonTest(beanFactory);*/
 		/*AwareTestBean awareTestBean = (AwareTestBean)beanFactory.getBean("awareTestBean");
 		System.out.println(awareTestBean);*/
 
-		/*ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
 		UserA userA = (UserA)context.getBean("userA");
-		UserB userB = (UserB)context.getBean("userB");*/
+		UserB userB = (UserB)context.getBean("userB");
 		//System.out.println(userA.getUserB().equals(userB));
 		//System.out.println(userB.getUserA().equals(userA));
 		/*AnnotationConfigApplicationContext classPathXmlApplicationContext = new AnnotationConfigApplicationContext("org/springframework/myTest");
