@@ -1,6 +1,7 @@
 package org.springframework.myTest;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -20,5 +21,12 @@ public class MyClassPathXmlApplicationContext extends ClassPathXmlApplicationCon
 	protected void initPropertySources() {
 		// 添加需要验证的系统属性
 		getEnvironment().setRequiredProperties("user.name");
+	}
+
+	@Override
+	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
+		super.setAllowBeanDefinitionOverriding(false);
+		super.setAllowCircularReferences(false);
+		super.customizeBeanFactory(beanFactory);
 	}
 }

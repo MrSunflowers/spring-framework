@@ -9,8 +9,8 @@
 	   http://www.Sunflower.org/schema/userA.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd"
 >
 
-	<context:annotation-config/>
-	<context:component-scan base-package="org.springframework.myTest"/>
+	<!--<context:annotation-config/>
+	<context:component-scan base-package="org.springframework.myTest"/>-->
 
 	<!-- 自定义标签 -->
 	<!--<myname:userA id="userA" name="username" age="18" email="12345875" />-->
