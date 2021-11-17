@@ -244,6 +244,7 @@ class BeanDefinitionValueResolver {
 			return null;
 		}
 		else {
+			// 解析 spel
 			return evaluate(value);
 		}
 	}
