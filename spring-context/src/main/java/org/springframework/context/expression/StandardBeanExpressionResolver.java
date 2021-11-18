@@ -142,8 +142,10 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 			return value;
 		}
 		try {
+			// 以前解析过了，直接返回解析结果
 			Expression expr = this.expressionCache.get(value);
 			if (expr == null) {
+				// 开始解析
 				expr = this.expressionParser.parseExpression(value, this.beanExpressionParserContext);
 				this.expressionCache.put(value, expr);
 			}

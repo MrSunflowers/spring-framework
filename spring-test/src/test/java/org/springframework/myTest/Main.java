@@ -14,6 +14,10 @@ import org.springframework.context.expression.StandardBeanExpressionResolver;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.myTest.AutowiredAnnotationBeanPostProcessorTest.AutowiredAnnotationBeanPostProcessorTest;
 import org.springframework.myTest.AwareTest.AwareTestBean;
 import org.springframework.myTest.CreateBeanTest.CreateBeanTestBean;
@@ -42,6 +46,7 @@ public class Main {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
 		UserA userA = (UserA)context.getBean("userA");
 		UserB userB = (UserB)context.getBean("userB");
+		System.out.println(userA);
 		//System.out.println(userA.getUserB().equals(userB));
 		//System.out.println(userB.getUserA().equals(userA));
 		/*AnnotationConfigApplicationContext classPathXmlApplicationContext = new AnnotationConfigApplicationContext("org/springframework/myTest");
@@ -50,6 +55,13 @@ public class Main {
 		System.out.println(userA.getUserB().equals(userB));
 		System.out.println(userB.getUserA().equals(userA));*/
 
+		//创建ExpressionParser解析表达式
+		ExpressionParser parser = new SpelExpressionParser();
+		//表达式放置
+		Expression exp = parser.parseExpression("userA");
+		//执行表达式，默认容器是spring本身的容器：ApplicationContext
+		Object value = exp.getValue();
+		System.out.println(value);
 
 	}
 	/**

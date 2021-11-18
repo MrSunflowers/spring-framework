@@ -18,6 +18,7 @@ public class UserA {
 	private String name;
 	private int age;
 	private int email;
+	@Value("#{userB}")
 	private UserB userB;
 
 	//private List<TestType> testType1;
