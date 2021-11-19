@@ -18,7 +18,7 @@ public class UserA {
 	private String name;
 	private int age;
 	private int email;
-	@Value("#{userB}")
+
 	private UserB userB;
 
 	//private List<TestType> testType1;
@@ -35,7 +35,7 @@ public class UserA {
 	public UserB getUserB() {
 		return userB;
 	}
-
+	@Value("#{userB}")
 	public void setUserB(UserB userB) {
 		this.userB = userB;
 	}

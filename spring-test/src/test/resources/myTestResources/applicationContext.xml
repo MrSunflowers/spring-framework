@@ -9,15 +9,15 @@
 	   http://www.Sunflower.org/schema/userA.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd"
 >
 
-	<!--<context:annotation-config/>
-	<context:component-scan base-package="org.springframework.myTest"/>-->
+	<context:annotation-config/>
+	<context:component-scan base-package="org.springframework.myTest"/>
 
 	<!-- 自定义标签 -->
 	<!--<myname:userA id="userA" name="username" age="18" email="12345875" />-->
 
 	<!--循环依赖-->
 	<bean name="userA" class="org.springframework.myTest.UserA" autowire="byType"/>
-	<bean name="userB" class="org.springframework.myTest.UserB" />
+	<bean name="userB" class="org.springframework.myTest.UserB" autowire="byType" />
 	<!--<bean name="testType1" class="org.springframework.myTest.testType.TestType1"/>
 	<bean name="testType2" class="org.springframework.myTest.testType.TestType2"/>-->
 
