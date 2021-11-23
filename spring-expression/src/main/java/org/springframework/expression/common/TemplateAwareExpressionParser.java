@@ -165,13 +165,13 @@ public abstract class TemplateAwareExpressionParser implements ExpressionParser 
 			throws ParseException {
 
 		// Chew on the expression text - relying on the rules:
-		// brackets must be in pairs: () [] {}
+		// brackets must be in pairs: () [] {} 括号必须成对
 		// string literals are "..." or '...' and these may contain unmatched brackets
 		int pos = afterPrefixIndex;
 		int maxlen = expressionString.length();
 		int nextSuffix = expressionString.indexOf(suffix, afterPrefixIndex);
 		if (nextSuffix == -1) {
-			return -1; // the suffix is missing
+			return -1; // the suffix is missing 缺少后缀
 		}
 		Deque<Bracket> stack = new ArrayDeque<>();
 		while (pos < maxlen) {

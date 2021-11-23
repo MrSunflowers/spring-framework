@@ -165,6 +165,7 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 				customizeEvaluationContext(sec);
 				this.evaluationCache.put(evalContext, sec);
 			}
+			// 获取解析后的值，包括类型转换
 			return expr.getValue(sec);
 		}
 		catch (Throwable ex) {

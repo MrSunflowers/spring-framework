@@ -4,6 +4,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanExpressionContext;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -60,7 +61,7 @@ public class Main {
 		//表达式放置
 		Expression exp = parser.parseExpression("userA");
 		//执行表达式，默认容器是spring本身的容器：ApplicationContext
-		Object value = exp.getValue();
+		Object value = exp.getValue(new BeanExpressionContext(context.getBeanFactory(), null));
 		System.out.println(value);
 
 	}
