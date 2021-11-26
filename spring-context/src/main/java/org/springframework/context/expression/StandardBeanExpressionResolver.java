@@ -142,7 +142,7 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 			return value;
 		}
 		try {
-			// 以前解析过了，直接返回解析结果
+			// 以前解析过了，缓存获取解析结果
 			Expression expr = this.expressionCache.get(value);
 			if (expr == null) {
 				// 开始解析

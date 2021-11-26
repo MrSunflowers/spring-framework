@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,8 +19,17 @@ public class UserA {
 	private String name;
 	private int age;
 	private int email;
+	private Date date;
 
 	private UserB userB;
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
 
 	//private List<TestType> testType1;
 
@@ -35,7 +45,6 @@ public class UserA {
 	public UserB getUserB() {
 		return userB;
 	}
-	@Value("#{userB}")
 	public void setUserB(UserB userB) {
 		this.userB = userB;
 	}

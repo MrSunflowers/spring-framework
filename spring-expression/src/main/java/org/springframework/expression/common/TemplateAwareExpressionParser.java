@@ -96,11 +96,13 @@ public abstract class TemplateAwareExpressionParser implements ExpressionParser 
 			int prefixIndex = expressionString.indexOf(prefix, startIdx);
 			if (prefixIndex >= startIdx) {
 				// an inner expression was found - this is a composite
+				//发现内部表达式，例如 abc#{user}
 				if (prefixIndex > startIdx) {
+					//记录表达式前面的字符串
 					expressions.add(new LiteralExpression(expressionString.substring(startIdx, prefixIndex)));
 				}
 				int afterPrefixIndex = prefixIndex + prefix.length();
-				int suffixIndex = skipToCorrectEndSuffix(suffix, expressionString, afterPrefixIndex);
+				int suffixIndex = skipToCorrectEndSuffix(suffix, expressionString, afterPrefixIndex);//寻找对应表达式的结束括号位置
 				if (suffixIndex == -1) {
 					throw new ParseException(expressionString, prefixIndex,
 							"No ending suffix '" + suffix + "' for expression starting at character " +
