@@ -45,6 +45,7 @@ public class Main {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
 		UserA userA = (UserA)context.getBean("userA");
 		System.out.println(userA.getDate());
+		System.out.println(userA.getName());
 		//System.out.println(userA.getUserB().equals(userB));
 		//System.out.println(userB.getUserA().equals(userA));
 		/*AnnotationConfigApplicationContext classPathXmlApplicationContext = new AnnotationConfigApplicationContext("org/springframework/myTest");
