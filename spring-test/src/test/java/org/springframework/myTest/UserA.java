@@ -19,6 +19,7 @@ public class UserA {
 	private String name;
 	private int age;
 	private int email;
+	private String password;
 	private Date date;
 
 	private UserB userB;
@@ -29,6 +30,14 @@ public class UserA {
 
 	public void setDate(Date date) {
 		this.date = date;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	//private List<TestType> testType1;
