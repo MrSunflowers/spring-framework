@@ -14,6 +14,12 @@
 
 	<!-- 自定义标签 -->
 	<!--<myname:userA id="userA" name="username" age="18" email="12345875" />-->
+	<!-- 这里 bean 的 id 必须为 messageSource -->
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename">
+			<value>myTestResources/message/message</value>
+		</property>
+	</bean>
 
 	<bean name="configurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations">

@@ -28,6 +28,8 @@ import org.springframework.myTest.factoryBeanTest.Color;
 import org.springframework.myTest.factoryBeanTest.Red;
 import org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor;
 
+import java.util.Locale;
+
 /**
  * @Description
  * @Author lyk
@@ -38,32 +40,8 @@ import org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcesso
 public class Main {
 
 	public static void main(String[] args) {
-		/*Resource resource = new ClassPathResource("myTestResources/applicationContext.xml");
-		XmlBeanFactory beanFactory = new XmlBeanFactory(resource);
-		earlySingletonTest(beanFactory);*/
-		/*AwareTestBean awareTestBean = (AwareTestBean)beanFactory.getBean("awareTestBean");
-		System.out.println(awareTestBean);*/
-
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
-		UserA userA = (UserA)context.getBean("userA");
-		System.out.println(userA.getDate());
-		System.out.println(userA.getName());
-		//System.out.println(userA.getUserB().equals(userB));
-		//System.out.println(userB.getUserA().equals(userA));
-		/*AnnotationConfigApplicationContext classPathXmlApplicationContext = new AnnotationConfigApplicationContext("org/springframework/myTest");
-		UserA userA = (UserA)classPathXmlApplicationContext.getBean("userA");
-		UserB userB = (UserB)classPathXmlApplicationContext.getBean("userB");
-		System.out.println(userA.getUserB().equals(userB));
-		System.out.println(userB.getUserA().equals(userA));*/
-
-		//创建ExpressionParser解析表达式
-		//ExpressionParser parser = new SpelExpressionParser();
-		//表达式放置
-		//Expression exp = parser.parseExpression("userA");
-		//执行表达式，默认容器是spring本身的容器：ApplicationContext
-		//Object value = exp.getValue();
-		//System.out.println(value);
-
+		System.out.println(context.getMessage("test",null, Locale.CHINA));
 	}
 	/**
 	 * description: 构造器测试 <br>
