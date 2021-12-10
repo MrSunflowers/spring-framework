@@ -22,6 +22,8 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.myTest.CreateBeanTest.CreateBeanTestBean;
 import org.springframework.myTest.MyBeanFactoryPostProcessor.MyBeanFactoryPostProcessor;
+import org.springframework.myTest.eventListener.TestEvent;
+import org.springframework.myTest.eventListener.TestListener;
 import org.springframework.myTest.factoryBeanTest.Blue;
 import org.springframework.myTest.factoryBeanTest.Car;
 import org.springframework.myTest.factoryBeanTest.Color;
@@ -41,7 +43,10 @@ public class Main {
 
 	public static void main(String[] args) {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
-		System.out.println(context.getMessage("test",null, Locale.CHINA));
+		TestEvent event = new TestEvent("hello","msg");
+		//触发 TestEvent 事件
+		context.publishEvent(event);
+		context.publishEvent(event);
 	}
 	/**
 	 * description: 构造器测试 <br>

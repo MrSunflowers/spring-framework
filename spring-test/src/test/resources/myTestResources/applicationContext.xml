@@ -12,6 +12,8 @@
 	<context:annotation-config/>
 	<context:component-scan base-package="org.springframework.myTest"/>
 
+	<bean id="testListener" class="org.springframework.myTest.eventListener.TestListener" />
+
 	<!-- 自定义标签 -->
 	<!--<myname:userA id="userA" name="username" age="18" email="12345875" />-->
 	<!-- 这里 bean 的 id 必须为 messageSource -->
