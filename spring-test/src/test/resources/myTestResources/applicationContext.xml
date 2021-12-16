@@ -12,12 +12,12 @@
 	<context:annotation-config/>
 	<context:component-scan base-package="org.springframework.myTest"/>
 
-	<bean id="testListener" class="org.springframework.myTest.eventListener.TestListener" />
+	<!--<bean id="testListener" class="org.springframework.myTest.eventListener.TestListener" />-->
 
 	<!-- 自定义标签 -->
 	<!--<myname:userA id="userA" name="username" age="18" email="12345875" />-->
 	<!-- 这里 bean 的 id 必须为 messageSource -->
-	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+	<!--<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename">
 			<value>myTestResources/message/message</value>
 		</property>
@@ -29,15 +29,21 @@
 				<value>myTestResources/userTest.properties</value>
 			</list>
 		</property>
+	</bean>-->
+
+	<bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+		<property name="converters">
+			<list>
+				<bean class="org.springframework.myTest.testConverter.String2DateConverter" />
+			</list>
+		</property>
 	</bean>
 
 	<!--循环依赖-->
 	<bean name="userA" class="org.springframework.myTest.UserA">
-		<property name="date" value="2021-11-25"/>
-		<property name="name" value="${myuser.name}" />
 	</bean>
 
-	<bean name="myPropertyEditor" class="org.springframework.myTest.PrpertyEdit.MyPropertyEditor" />
+	<!--<bean name="myPropertyEditor" class="org.springframework.myTest.PrpertyEdit.MyPropertyEditor" />
 
 	<bean name="datePropertyEditorRegistrars" class="org.springframework.myTest.PrpertyEdit.DatePropertyEditorRegistrars">
 		<property name="propertyEditor" ref="myPropertyEditor" />
@@ -48,7 +54,7 @@
 				<ref bean="datePropertyEditorRegistrars" />
 			</list>
 		</property>
-	</bean>
+	</bean>-->
 	<!--<bean name="testType1" class="org.springframework.myTest.testType.TestType1"/>
 	<bean name="testType2" class="org.springframework.myTest.testType.TestType2"/>-->
 

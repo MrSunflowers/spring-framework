@@ -14,6 +14,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
 import org.springframework.context.expression.StandardBeanExpressionResolver;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.expression.Expression;
@@ -30,6 +31,7 @@ import org.springframework.myTest.factoryBeanTest.Color;
 import org.springframework.myTest.factoryBeanTest.Red;
 import org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor;
 
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -43,10 +45,9 @@ public class Main {
 
 	public static void main(String[] args) {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
-		TestEvent event = new TestEvent("hello","msg");
-		//触发 TestEvent 事件
-		context.publishEvent(event);
-		context.publishEvent(event);
+		ConversionService conversionService = context.getBeanFactory().getConversionService();
+		Date convert = conversionService.convert("2020-12-10", Date.class);
+		System.out.println(convert);
 	}
 	/**
 	 * description: 构造器测试 <br>
