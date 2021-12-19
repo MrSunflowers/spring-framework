@@ -31,18 +31,18 @@
 		</property>
 	</bean>-->
 
-	<bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+	<!--<bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
 		<property name="converters">
 			<list>
 				<bean class="org.springframework.myTest.testConverter.String2DateConverter" />
 			</list>
 		</property>
-	</bean>
+	</bean>-->
 
 	<!--循环依赖-->
-	<bean name="userA" class="org.springframework.myTest.UserA" >
+	<!--<bean name="userA" class="org.springframework.myTest.UserA" >
 
-	</bean>
+	</bean>-->
 	<bean name="testLifecycle" class="org.springframework.myTest.TestLifecycle.TestLifecycle"/>
 
 	<!--<bean name="myPropertyEditor" class="org.springframework.myTest.PrpertyEdit.MyPropertyEditor" />

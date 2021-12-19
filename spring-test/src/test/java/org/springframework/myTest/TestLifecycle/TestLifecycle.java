@@ -2,6 +2,7 @@ package org.springframework.myTest.TestLifecycle;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.Lifecycle;
+import org.springframework.context.SmartLifecycle;
 
 /**
  * @Description

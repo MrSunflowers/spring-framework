@@ -45,9 +45,8 @@ public class Main {
 
 	public static void main(String[] args) {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
-		ConversionService conversionService = context.getBeanFactory().getConversionService();
-		Date convert = conversionService.convert("2020-12-10", Date.class);
-		System.out.println(convert);
+		context.start();
+		context.close();
 	}
 	/**
 	 * description: 构造器测试 <br>
