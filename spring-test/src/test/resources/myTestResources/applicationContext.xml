@@ -11,6 +11,7 @@
 
 	<context:annotation-config/>
 	<context:component-scan base-package="org.springframework.myTest"/>
+	<import resource="applicationContext_AOP.xml" />
 
 	<!--<bean id="testListener" class="org.springframework.myTest.eventListener.TestListener" />-->
 
@@ -43,7 +44,7 @@
 	<!--<bean name="userA" class="org.springframework.myTest.UserA" >
 
 	</bean>-->
-	<bean name="testLifecycle" class="org.springframework.myTest.TestLifecycle.TestLifecycle"/>
+	<!--<bean name="testLifecycle" class="org.springframework.myTest.TestLifecycle.TestLifecycle"/>-->
 
 	<!--<bean name="myPropertyEditor" class="org.springframework.myTest.PrpertyEdit.MyPropertyEditor" />
 

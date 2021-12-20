@@ -1,38 +1,15 @@
 package org.springframework.myTest;
 
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanExpressionContext;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
-import org.springframework.context.expression.StandardBeanExpressionResolver;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.myTest.CreateBeanTest.CreateBeanTestBean;
-import org.springframework.myTest.MyBeanFactoryPostProcessor.MyBeanFactoryPostProcessor;
-import org.springframework.myTest.eventListener.TestEvent;
-import org.springframework.myTest.eventListener.TestListener;
+import org.springframework.myTest.aop.demo.*;
 import org.springframework.myTest.factoryBeanTest.Blue;
 import org.springframework.myTest.factoryBeanTest.Car;
 import org.springframework.myTest.factoryBeanTest.Color;
 import org.springframework.myTest.factoryBeanTest.Red;
-import org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor;
-
-import java.util.Date;
-import java.util.Locale;
+import org.springframework.cglib.proxy.Enhancer;
+import java.lang.reflect.Proxy;
 
 /**
  * @Description
@@ -44,10 +21,35 @@ import java.util.Locale;
 public class Main {
 
 	public static void main(String[] args) {
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
-		context.start();
-		context.close();
+		/*ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext_AOP.xml");
+		TestService testService = (TestService) context.getBean("testServiceStaticProxy");
+		testService.save();*/
+		/*TestService testService = (TestService)Proxy.newProxyInstance(TestServiceImpl.class.getClassLoader(), new Class[]{TestService.class}, new MyInvocationHandler(new TestServiceImpl()));
+		testService.save();*/
+
+		Enhancer enhancer = new Enhancer();
+		enhancer.setSuperclass(TestServiceImpl.class);
+		enhancer.setCallback(new MyMethodInterceptor());
+		TestService testService = (TestService)enhancer.create();
+		testService.save();
+
+		/*System.out.println(testService.getClass().getName());
+		Class<?>[] interfaces = testService.getClass().getInterfaces();
+		for (Class<?> c : interfaces) {
+			System.out.println("interfaces:"+c.getName());
+		}
+		printSuperclass(testService.getClass());
+		System.out.println(testService instanceof Proxy);*/
 	}
+
+	private static void printSuperclass(Class<?> clz){
+		Class<?> superclass = clz.getSuperclass();
+		if(superclass!=null){
+			System.out.println("superclass:"+superclass.getName());
+			printSuperclass(superclass.getSuperclass());
+		}
+	}
+
 	/**
 	 * description: 构造器测试 <br>
 	 * version: 1.0 <br>
