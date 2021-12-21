@@ -2,14 +2,13 @@ package org.springframework.myTest;
 
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.myTest.CreateBeanTest.CreateBeanTestBean;
-import org.springframework.myTest.aop.demo.*;
+import org.springframework.myTest.aop.demo.TestService;
 import org.springframework.myTest.factoryBeanTest.Blue;
 import org.springframework.myTest.factoryBeanTest.Car;
 import org.springframework.myTest.factoryBeanTest.Color;
 import org.springframework.myTest.factoryBeanTest.Red;
-import org.springframework.cglib.proxy.Enhancer;
-import java.lang.reflect.Proxy;
 
 /**
  * @Description
@@ -20,26 +19,18 @@ import java.lang.reflect.Proxy;
  */
 public class Main {
 
-	public static void main(String[] args) {
-		/*ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext_AOP.xml");
-		TestService testService = (TestService) context.getBean("testServiceStaticProxy");
-		testService.save();*/
-		/*TestService testService = (TestService)Proxy.newProxyInstance(TestServiceImpl.class.getClassLoader(), new Class[]{TestService.class}, new MyInvocationHandler(new TestServiceImpl()));
-		testService.save();*/
+	public static void main(String[] args) throws Exception {
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext_AOP.xml");
+		TestService testServiceImpl = (TestService) context.getBean("testServiceImpl");
+		testServiceImpl.save();
+	}
 
-		Enhancer enhancer = new Enhancer();
+	private void CGlib(){
+		/*Enhancer enhancer = new Enhancer();
 		enhancer.setSuperclass(TestServiceImpl.class);
 		enhancer.setCallback(new MyMethodInterceptor());
-		TestService testService = (TestService)enhancer.create();
-		testService.save();
-
-		/*System.out.println(testService.getClass().getName());
-		Class<?>[] interfaces = testService.getClass().getInterfaces();
-		for (Class<?> c : interfaces) {
-			System.out.println("interfaces:"+c.getName());
-		}
-		printSuperclass(testService.getClass());
-		System.out.println(testService instanceof Proxy);*/
+		TestServiceImpl testServiceImpl = (TestServiceImpl)enhancer.create();
+		testServiceImpl.save()*/;
 	}
 
 	private static void printSuperclass(Class<?> clz){
