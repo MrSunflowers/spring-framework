@@ -5,8 +5,9 @@ import org.aspectj.lang.annotation.*;
 
 @Aspect
 public class TransactionManager {
+	//https://www.cnblogs.com/joy99/p/10941543.html
 	//定义切入点，切入点名称为方法名称
-	@Pointcut("execution(* org.springframework.myTest.aop.demo.*Service*.*(..))")
+	@Pointcut("execution(* org.springframework.myTest..*Service.*(..)) and bean(testServiceImpl) and within(org.springframework.myTest.aop.demo.*)")
 	public void pointcut(){
 	}
 
