@@ -55,31 +55,39 @@ public abstract class AopNamespaceUtils {
 
 	public static void registerAutoProxyCreatorIfNecessary(
 			ParserContext parserContext, Element sourceElement) {
-
+		// 1. 升级或创建 自动代理创建器的 beanDefinition
 		BeanDefinition beanDefinition = AopConfigUtils.registerAutoProxyCreatorIfNecessary(
 				parserContext.getRegistry(), parserContext.extractSource(sourceElement));
+		// 2. 处理 config 标签的 proxy-target-class 和 expose-proxy 属性
 		useClassProxyingIfNecessary(parserContext.getRegistry(), sourceElement);
+		// 3. 注册组件并触发组件注册监听回调，由监听器进一步处理
 		registerComponentIfNecessary(beanDefinition, parserContext);
 	}
 
 	public static void registerAspectJAutoProxyCreatorIfNecessary(
 			ParserContext parserContext, Element sourceElement) {
-
+		// 1. 升级或创建 自动代理创建器的 beanDefinition
 		BeanDefinition beanDefinition = AopConfigUtils.registerAspectJAutoProxyCreatorIfNecessary(
 				parserContext.getRegistry(), parserContext.extractSource(sourceElement));
+		// 2. 处理 config 标签的 proxy-target-class 和 expose-proxy 属性
 		useClassProxyingIfNecessary(parserContext.getRegistry(), sourceElement);
+		// 3. 注册组件并触发组件注册监听回调，由监听器进一步处理
 		registerComponentIfNecessary(beanDefinition, parserContext);
 	}
 
 	public static void registerAspectJAnnotationAutoProxyCreatorIfNecessary(
 			ParserContext parserContext, Element sourceElement) {
-
+		// 1. 升级或创建 自动代理创建器的 beanDefinition
 		BeanDefinition beanDefinition = AopConfigUtils.registerAspectJAnnotationAutoProxyCreatorIfNecessary(
 				parserContext.getRegistry(), parserContext.extractSource(sourceElement));
+		// 2. 处理 config 标签的 proxy-target-class 和 expose-proxy 属性
 		useClassProxyingIfNecessary(parserContext.getRegistry(), sourceElement);
+		// 3. 注册组件并触发组件注册监听回调，由监听器进一步处理
 		registerComponentIfNecessary(beanDefinition, parserContext);
 	}
-
+	/**
+	 * 处理 config 标签的 proxy-target-class 和 expose-proxy 属性
+	 */
 	private static void useClassProxyingIfNecessary(BeanDefinitionRegistry registry, @Nullable Element sourceElement) {
 		if (sourceElement != null) {
 			boolean proxyTargetClass = Boolean.parseBoolean(sourceElement.getAttribute(PROXY_TARGET_CLASS_ATTRIBUTE));
@@ -92,7 +100,9 @@ public abstract class AopNamespaceUtils {
 			}
 		}
 	}
-
+	/**
+	 * 注册组件并触发组件注册监听回调，由监听器 {@link org.springframework.beans.factory.parsing.ReaderEventListener#componentRegistered} 进一步处理
+	 */
 	private static void registerComponentIfNecessary(@Nullable BeanDefinition beanDefinition, ParserContext parserContext) {
 		if (beanDefinition != null) {
 			parserContext.registerComponent(
