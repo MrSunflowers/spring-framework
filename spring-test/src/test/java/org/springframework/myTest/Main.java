@@ -25,7 +25,6 @@ public class Main {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext_AOP.xml");
 		TestServiceImpl testServiceImpl = (TestServiceImpl) context.getBean("testServiceImpl");
 		testServiceImpl.save();
-		((AddService)testServiceImpl).update();
 	}
 
 	private void CGlib(){
