@@ -23,7 +23,7 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext_AOP.xml");
-		TestServiceImpl testServiceImpl = (TestServiceImpl) context.getBean("testServiceImpl");
+		TestServiceImpl testServiceImpl = (TestServiceImpl) context.getBean("org.springframework.myTest.aop.demo.TestServiceImpl.ORIGINAL");
 		testServiceImpl.save();
 	}
 
