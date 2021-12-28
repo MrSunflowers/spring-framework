@@ -15,7 +15,7 @@
 	<context:component-scan base-package="org.springframework.myTest"/>-->
 	<!--<aop:aspectj-autoproxy/>-->
 
-	<bean name="org.springframework.myTest.aop.demo.TestServiceImpl.ORIGINAL" class="org.springframework.myTest.aop.demo.TestServiceImpl" init-method="myInit" />
+	<bean name="testServiceImpl" class="org.springframework.myTest.aop.demo.TestServiceImpl" init-method="myInit" />
 
 	<bean name="transactionManager" class="org.springframework.myTest.aop.demo.TransactionManager" />
 

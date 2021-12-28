@@ -51,6 +51,10 @@ import org.springframework.util.Assert;
 @SuppressWarnings("serial")
 public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyCreator {
 
+	/**
+	 * 用于从 BeanFactory 检索 Spring Advisor 的助手，用于自动代理 <br>
+	 * date: 2021/12/28 16:16 <br>
+	 */
 	@Nullable
 	private BeanFactoryAdvisorRetrievalHelper advisorRetrievalHelper;
 

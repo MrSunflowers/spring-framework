@@ -250,7 +250,8 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 			if (this.advisedBeans.containsKey(cacheKey)) {
 				return null;
 			}
-			// 是否表示不应被代理的基础结构类 ||
+			// 是否表示不应被代理的基础结构类 || 给定的 bean 名称是需要跳过的代理的 bean
+			// 使用 bean 的全限定名称 + .ORIGINAL 表示当前类跳过代理
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
 				return null;
@@ -260,6 +261,8 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		// Create proxy here if we have a custom TargetSource.
 		// Suppresses unnecessary default instantiation of the target bean:
 		// The TargetSource will handle target instances in a custom fashion.
+		// 如果配置了 TargetSourceCreator 那么将在这里创建实例，以禁止目标 bean 的不必要的默认实例化：
+		// TargetSource 将以自定义方式处理目标实例。
 		TargetSource targetSource = getCustomTargetSource(beanClass, beanName);
 		if (targetSource != null) {
 			if (StringUtils.hasLength(beanName)) {
