@@ -58,6 +58,7 @@ public interface MethodMatcher {
 	 * method returns {@code false}, no runtime check (i.e. no
 	 * {@link #matches(java.lang.reflect.Method, Class, Object[])} call)
 	 * will be made.
+	 * <p>这个称为静态匹配：在匹配条件不是太严格时使用，可以满足大部分场景的使用
 	 * @param method the candidate method
 	 * @param targetClass the target class
 	 * @return whether or not this method matches statically
@@ -70,6 +71,11 @@ public interface MethodMatcher {
 	 * runtime even if the 2-arg matches method returns {@code true}?
 	 * <p>Can be invoked when an AOP proxy is created, and need not be invoked
 	 * again before each method invocation,
+	 * <p>是否需要执行动态匹配
+	 * <p>两个方法的分界线就是boolean isRuntime()方法，步骤如下
+	 * <p>1、先调用静态匹配，若返回true。此时就会继续去检查isRuntime()的返回值
+	 * <p>2、若isRuntime()还返回true，那就继续调用动态匹配
+	 * <p>(若静态匹配失败，则动态匹配一定失败)
 	 * @return whether or not a runtime match via the 3-arg
 	 * {@link #matches(java.lang.reflect.Method, Class, Object[])} method
 	 * is required if static matching passed
@@ -84,6 +90,7 @@ public interface MethodMatcher {
 	 * {@link #isRuntime()} method returns {@code true}. Invoked
 	 * immediately before potential running of the advice, after any
 	 * advice earlier in the advice chain has run.
+	 * <p>这个称为动态匹配（运行时匹配）: 它是严格的匹配。在运行时动态的对参数的类型进行匹配
 	 * @param method the candidate method
 	 * @param targetClass the target class
 	 * @param args arguments to the method
