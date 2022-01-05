@@ -4,9 +4,7 @@ import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostP
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.myTest.CreateBeanTest.CreateBeanTestBean;
-import org.springframework.myTest.aop.demo.AddService;
 import org.springframework.myTest.aop.demo.TestService;
-import org.springframework.myTest.aop.demo.TestServiceImpl;
 import org.springframework.myTest.factoryBeanTest.Blue;
 import org.springframework.myTest.factoryBeanTest.Car;
 import org.springframework.myTest.factoryBeanTest.Color;
@@ -22,9 +20,10 @@ import org.springframework.myTest.factoryBeanTest.Red;
 public class Main {
 
 	public static void main(String[] args) throws Exception {
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext_AOP.xml");
-		TestServiceImpl testServiceImpl = (TestServiceImpl) context.getBean("testServiceImpl");
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext_AOPtest.xml");
+		TestService testServiceImpl = (TestService) context.getBean("testServiceImpl");
 		testServiceImpl.save();
+		testServiceImpl.AsaveBb();
 	}
 
 	private void CGlib(){

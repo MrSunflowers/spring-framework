@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.springframework.org/schema/aop
+	   https://www.springframework.org/schema/aop/spring-aop.xsd"
+>
+
+	<bean name="testServiceImpl" class="org.springframework.myTest.aop.demo.TestServiceImpl" />
+
+	<bean name="transactionManager" class="org.springframework.myTest.aop.demo.TransactionManager" />
+
+	<bean id="regexPointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut">
+		<property name="patterns">
+			<list value-type="java.lang.String">
+				<value>.*save.*</value><!-- 拦截所有方法名含有save的方法 -->
+			</list>
+		</property>
+	</bean>
+
+	<aop:config >
+		<aop:advisor advice-ref="transactionManager" pointcut-ref="regexPointcut" />
+	</aop:config>
+
+</beans>

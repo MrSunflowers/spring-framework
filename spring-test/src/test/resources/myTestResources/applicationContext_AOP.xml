@@ -19,10 +19,12 @@
 
 	<bean name="transactionManager" class="org.springframework.myTest.aop.demo.TransactionManager" />
 
-	<aop:config proxy-target-class="true" expose-proxy="true" >
+
+	<aop:config >
 
 		<!--切入点-->
-		<aop:pointcut id="transactionPointcut" expression="execution(* org.springframework.myTest..*Service*.*(..))"/>
+		<!--<aop:pointcut id="transactionPointcut" expression="execution(* org.springframework.myTest..*Service*.*(..))"/>-->
+		<aop:pointcut id="transactionPointcut" expression="@target(org.springframework.myTest.aop.demo.A1)"/>
 
 		<!-- 切面 = 切入点 + 通知 -->
 		<aop:aspect ref="transactionManager" >
