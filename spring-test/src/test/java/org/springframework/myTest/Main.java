@@ -20,7 +20,7 @@ import org.springframework.myTest.factoryBeanTest.Red;
 public class Main {
 
 	public static void main(String[] args) throws Exception {
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext_AOPtest.xml");
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext_AOP.xml");
 		TestService testServiceImpl = (TestService) context.getBean("testServiceImpl");
 		testServiceImpl.save();
 		testServiceImpl.AsaveBb();
