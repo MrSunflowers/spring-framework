@@ -244,13 +244,14 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 
 	@Override
 	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) {
+		// 生成一个名称
 		Object cacheKey = getCacheKey(beanClass, beanName);
-		// 没有被代理过
+		// 没有被处理过
 		if (!StringUtils.hasLength(beanName) || !this.targetSourcedBeans.contains(beanName)) {
 			if (this.advisedBeans.containsKey(cacheKey)) {
 				return null;
 			}
-			// 是否表示不应被代理的基础结构类 || 给定的 bean 名称是需要跳过代理的 bean
+			// 表示不应被代理的基础结构类 || 给定的 bean 名称是需要跳过代理的 bean
 			// 当使用 bean 的全限定名称 + .ORIGINAL 表示当前类跳过代理
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
