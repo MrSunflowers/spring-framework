@@ -20,10 +20,10 @@ import org.springframework.myTest.factoryBeanTest.Red;
 public class Main {
 
 	public static void main(String[] args) throws Exception {
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext_AOP.xml");
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
 		TestService testServiceImpl = (TestService) context.getBean("testServiceImpl");
 		testServiceImpl.save();
-		testServiceImpl.AsaveBb();
+		//testServiceImpl.AsaveBb();
 	}
 
 	private void CGlib(){

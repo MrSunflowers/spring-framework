@@ -5,11 +5,13 @@ import org.springframework.aop.AfterReturningAdvice;
 import org.springframework.aop.BeforeAdvice;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
 
+@Service
 @A1
-public class TestServiceImpl implements InitializingBean,TestService {
+public class TestServiceImpl implements TestService {
 
 	public void save() throws Exception {
 		System.out.println("保存数据到数据库");
@@ -26,7 +28,6 @@ public class TestServiceImpl implements InitializingBean,TestService {
 		System.out.println("更新数据到数据库");
 	}
 
-	@Override
 	public void afterPropertiesSet() throws Exception {
 		System.out.println("afterPropertiesSet");
 	}
