@@ -336,7 +336,6 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 			this.parseState.push(new AdviceEntry(parserContext.getDelegate().getLocalName(adviceElement)));
 
 			// create the method factory bean
-			// 1. 构建 MethodLocatingFactoryBean BeanDefinition
 			RootBeanDefinition methodDefinition = new RootBeanDefinition(MethodLocatingFactoryBean.class);
 			// 通知 beanName
 			methodDefinition.getPropertyValues().add("targetBeanName", aspectName);
@@ -345,14 +344,13 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 			methodDefinition.setSynthetic(true);
 
 			// create instance factory definition
-			// 2. 构建 SimpleBeanFactoryAwareAspectInstanceFactory BeanDefinition
 			RootBeanDefinition aspectFactoryDef =
 					new RootBeanDefinition(SimpleBeanFactoryAwareAspectInstanceFactory.class);
 			aspectFactoryDef.getPropertyValues().add("aspectBeanName", aspectName);
 			aspectFactoryDef.setSynthetic(true);
 
 			// register the pointcut
-			// 3. 将标签解析为 BeanDefinition
+			// 将标签解析为 BeanDefinition
 			AbstractBeanDefinition adviceDef = createAdviceDefinition(
 					adviceElement, parserContext, aspectName, order, methodDefinition, aspectFactoryDef,
 					beanDefinitions, beanReferences);
@@ -388,7 +386,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 			Element adviceElement, ParserContext parserContext, String aspectName, int order,
 			RootBeanDefinition methodDef, RootBeanDefinition aspectFactoryDef,
 			List<BeanDefinition> beanDefinitions, List<BeanReference> beanReferences) {
-		// 1. 根据增强位置的不同选择不同的通知实现类
+		// 根据增强位置的不同选择不同的 Advice 实现类
 		RootBeanDefinition adviceDefinition = new RootBeanDefinition(getAdviceClass(adviceElement, parserContext));
 		adviceDefinition.setSource(parserContext.extractSource(adviceElement));
 		// 对应的通知类
@@ -471,14 +469,14 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 			pointcutDefinition.setSource(parserContext.extractSource(pointcutElement));
 
 			String pointcutBeanName = id;
-			// 2. 生成 pointcutBeanName
+			// 2. 注册 pointcut BeanDefinition
 			if (StringUtils.hasText(pointcutBeanName)) {
 				parserContext.getRegistry().registerBeanDefinition(pointcutBeanName, pointcutDefinition);
 			}
 			else {
 				pointcutBeanName = parserContext.getReaderContext().registerWithGeneratedName(pointcutDefinition);
 			}
-			// 3. 注册 pointcut BeanDefinition
+			// 3. 注册组件并触发监听事件
 			parserContext.registerComponent(
 					new PointcutComponentDefinition(pointcutBeanName, pointcutDefinition, expression));
 		}
