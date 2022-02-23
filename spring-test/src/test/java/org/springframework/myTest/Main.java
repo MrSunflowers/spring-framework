@@ -18,12 +18,13 @@ import org.springframework.myTest.factoryBeanTest.Red;
  * @Date 2021/6/21
  */
 public class Main {
-
+	volatile int i= 10;
 	public static void main(String[] args) throws Exception {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
 		TestService testServiceImpl = (TestService) context.getBean("testServiceImpl");
 		testServiceImpl.save();
 		//testServiceImpl.AsaveBb();
+
 	}
 
 	private void CGlib(){

@@ -48,11 +48,23 @@ import org.springframework.core.NativeDetector;
 @SuppressWarnings("serial")
 public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 
-
+	/**
+	 * 到此已经完成了代理的创建，从if中的判断条件可以看到3个方面影响着Spring创建代理方式的判断
+	 * <p>1.如果目标对象实现了接口，默认情况下会采用JDK 的动态代理实现AOP 。
+	 * <p>2.如果目标对象实现了接口，可以强制使用CGLIB 实现AOP 。
+	 * <p>3.如果目标对象没有实现接口，必须采用CGLIB库，Spring会自动在JDK动态代理和CGLIB 之间转换
+	 */
 	@Override
 	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
 		if (!NativeDetector.inNativeImage() &&
-				(config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config))) {
+				//1. Optimize：用来控制通过 CGLIB 创建的代理是否使用激进的优化策略。除非完全了解
+				//AOP 代理如何处理优化，否则不推荐用户使用这个设置。目前这个属性仅用于CGLIB
+				//代理，对于JDK动态代理（默认代理）无效
+				(config.isOptimize() ||
+						//2.是否强制使用Cglib代理
+						config.isProxyTargetClass() ||
+						//3.是否存在代理接口
+						hasNoUserSuppliedProxyInterfaces(config))) {
 			Class<?> targetClass = config.getTargetClass();
 			if (targetClass == null) {
 				throw new AopConfigException("TargetSource cannot determine target class: " +
@@ -64,6 +76,9 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 			return new ObjenesisCglibAopProxy(config);
 		}
 		else {
+			// JDKProxy 的使用关键是创建自定义的InvocationHandler ，而InvocationHandler 中包含了需要覆盖的函数getProxy
+			// 而 JdkDynamicAopProxy 也确实实现了而 InvocationHandler 接口，那么 JdkDynamicAopProxy 中一定会有一个 invoke 函数，
+			// 并且将 aop 的核心逻辑写在其中
 			return new JdkDynamicAopProxy(config);
 		}
 	}

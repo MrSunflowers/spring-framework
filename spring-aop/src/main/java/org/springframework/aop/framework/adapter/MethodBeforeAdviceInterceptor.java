@@ -30,6 +30,7 @@ import org.springframework.util.Assert;
  * Interceptor to wrap a {@link MethodBeforeAdvice}.
  * <p>Used internally by the AOP framework; application developers should not
  * need to use this class directly.
+ * <p>MethodBeforeAdvice 的拦截器(增强器)实现，用于 AOP 框架内部使用
  *
  * @author Rod Johnson
  * @see AfterReturningAdviceInterceptor
@@ -54,6 +55,7 @@ public class MethodBeforeAdviceInterceptor implements MethodInterceptor, BeforeA
 	@Override
 	@Nullable
 	public Object invoke(MethodInvocation mi) throws Throwable {
+		//调用 AspectJMethodBeforeAdvice.before
 		this.advice.before(mi.getMethod(), mi.getArguments(), mi.getThis());
 		return mi.proceed();
 	}

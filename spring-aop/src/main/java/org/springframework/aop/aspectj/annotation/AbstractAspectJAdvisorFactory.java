@@ -127,6 +127,8 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 	/**
 	 * Find and return the first AspectJ annotation on the given method
 	 * (there <i>should</i> only be one anyway...).
+	 * <p>找到并返回给定方法上的第一个 AspectJ 注解
+	 * <p>无论如何方法上只能有一个 AspectJ 注解
 	 */
 	@SuppressWarnings("unchecked")
 	@Nullable
@@ -140,6 +142,9 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 		return null;
 	}
 
+	/**
+	 * <p>找到并返回给定方法上的注解
+	 */
 	@Nullable
 	private static <A extends Annotation> AspectJAnnotation<A> findAnnotation(Method method, Class<A> toLookFor) {
 		A result = AnnotationUtils.findAnnotation(method, toLookFor);

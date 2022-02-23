@@ -99,6 +99,8 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
 		// 1. 查找所有的 Advisor 以用于自动代理
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
+		// 前面已经完成了所有增强器的解析，但是对于所有增强器来讲，并不一定都适用于当前的Bean，
+		// 还要挑取出适合的增强器，也就是满足我们配置的通配符的增强器
 		// 2. 匹配可以应用于该类的 Advisor
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
 		extendAdvisors(eligibleAdvisors);
@@ -109,9 +111,8 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	}
 
 	/**
-	 * Find all candidate Advisors to use in auto-proxying.
-	 * <p>查找所有候选 Advisor 以用于自动代理
-	 * <p>包括提取注解中的 Advisor 在子类{@link org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator#findCandidateAdvisors}中实现
+	 * <p>Find all candidate Advisors to use in auto-proxying.
+	 * <p>查找所有的候选 Advisor 以用于自动代理
 	 * @return the List of candidate Advisors
 	 */
 	protected List<Advisor> findCandidateAdvisors() {

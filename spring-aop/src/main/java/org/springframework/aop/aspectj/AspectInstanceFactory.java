@@ -22,6 +22,7 @@ import org.springframework.lang.Nullable;
 /**
  * Interface implemented to provide an instance of an AspectJ aspect.
  * Decouples from Spring's bean factory.
+ * <p>该接口主要用于从给定的类（或者 beanName 等）获取一个切面实例
  *
  * <p>Extends the {@link org.springframework.core.Ordered} interface
  * to express an order value for the underlying aspect in a chain.

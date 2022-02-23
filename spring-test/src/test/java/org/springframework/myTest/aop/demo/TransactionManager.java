@@ -16,6 +16,7 @@ public class TransactionManager {
 	public void pointcut(){}
 
 	@Before("pointcut()")
+	@After("pointcut()")
 	public void begin(){
 		System.out.println("开启事务");
 	}
