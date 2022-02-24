@@ -18,7 +18,6 @@ import org.springframework.myTest.factoryBeanTest.Red;
  * @Date 2021/6/21
  */
 public class Main {
-	volatile int i= 10;
 	public static void main(String[] args) throws Exception {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/applicationContext.xml");
 		TestService testServiceImpl = (TestService) context.getBean("testServiceImpl");
@@ -27,13 +26,7 @@ public class Main {
 
 	}
 
-	private void CGlib(){
-		/*Enhancer enhancer = new Enhancer();
-		enhancer.setSuperclass(TestServiceImpl.class);
-		enhancer.setCallback(new MyMethodInterceptor());
-		TestServiceImpl testServiceImpl = (TestServiceImpl)enhancer.create();
-		testServiceImpl.save()*/;
-	}
+
 
 	private static void printSuperclass(Class<?> clz){
 		Class<?> superclass = clz.getSuperclass();
