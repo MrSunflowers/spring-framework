@@ -17,6 +17,7 @@ public class TestServiceImpl implements TestService {
 		System.out.println("保存数据到数据库");
 		//this.update(); 此处的 this 指向目标对象，因此无法实施切面中的增强
 		//((TestServiceImpl)AopContext.currentProxy()).update();
+		//throw new Exception();
 	}
 
 	@Override

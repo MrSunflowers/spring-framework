@@ -16,19 +16,18 @@ public class TransactionManager {
 	public void pointcut(){}
 
 	@Before("pointcut()")
-	@After("pointcut()")
 	public void begin(){
 		System.out.println("开启事务");
 	}
-
+	@AfterReturning("pointcut()")
 	public void commit(){
 		System.out.println("事务提交");
 	}
-
+	@AfterThrowing(value = "pointcut()",throwing = "e")
 	public void rollBack(Exception e){
 		System.out.println("事务回滚" + e);
 	}
-
+	@After("pointcut()")
 	public void close(){
 		System.out.println("释放资源");
 	}
