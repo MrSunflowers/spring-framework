@@ -1,7 +1,6 @@
-package org.springframework.myTest.aop.demo;
+package org.springframework.myTest.aop.demo._20230422;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.myTest.aop.demo._20230422.TestService;
 
 /**
  * @Description
@@ -14,9 +13,8 @@ public class aopmain {
 
 	public static void main(String[] args) throws Exception {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("myTestResources/20230422/applicationContext_AOP.xml");
-		TestService  testServiceImpl = (TestService) context.getBean("testServiceImpl");
+		TestService testServiceImpl = (TestService) context.getBean("testServiceImpl");
 		testServiceImpl.save();
-		System.out.println(213);
 	}
 
 }

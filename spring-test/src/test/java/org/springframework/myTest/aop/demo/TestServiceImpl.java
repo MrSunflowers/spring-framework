@@ -20,7 +20,7 @@ public class TestServiceImpl implements TestService {
 		//throw new Exception();
 	}
 
-	@Override
+	/*@Override
 	public void AsaveBb() throws Exception {
 		System.out.println("save2");
 	}
@@ -35,6 +35,6 @@ public class TestServiceImpl implements TestService {
 
 	public void myInit(){
 		System.out.println("myInit");
-	}
+	}*/
 
 }
