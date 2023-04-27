@@ -339,7 +339,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
 			return bean;
 		}
-		// 不需要代理或跳过
+		// 给定的 bean 类是否代表一个基础类，基础类不应代理，或者配置了指定的 bean 不需要自动代理
 		if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
 			this.advisedBeans.put(cacheKey, Boolean.FALSE);
 			return bean;
@@ -457,9 +457,9 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		}
 
 		ProxyFactory proxyFactory = new ProxyFactory();
-		//获取当前类中相关属性
+		// 拷贝当前类中相关属性到 ProxyFactory 中
 		proxyFactory.copyFrom(this);
-		//是否强制使用 CGLIB 动态代理
+		// 是否强制使用 CGLIB 动态代理
 		if (proxyFactory.isProxyTargetClass()) {
 			// Explicit handling of JDK proxy targets (for introduction advice scenarios)
 			if (Proxy.isProxyClass(beanClass)) {
@@ -472,8 +472,8 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		}
 		else {
 			// No proxyTargetClass flag enforced, let's apply our default checks...
-			// 没有强制使用 CGLIB 动态代理，开始正常判断流程
-			// 是否应该使用 CGLIB 动态代理 以及检查 PRESERVE_TARGET_CLASS_ATTRIBUTE 属性
+			// 没有强制使用 CGLIB 代理，开始正常判断流程
+			// 是否应该使用 CGLIB 代理，而不是使用其接口代理
 			if (shouldProxyTargetClass(beanClass, beanName)) {
 				proxyFactory.setProxyTargetClass(true);
 			}
@@ -541,14 +541,15 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 */
 	protected Advisor[] buildAdvisors(@Nullable String beanName, @Nullable Object[] specificInterceptors) {
 		// Handle prototypes correctly...
-		// 解析注册所有的拦截器 Interceptor
+		// 1. 解析注册所有的公共拦截器 Interceptor
 		Advisor[] commonInterceptors = resolveInterceptorNames();
 
 		List<Object> allInterceptors = new ArrayList<>();
+		// 2. 处理特定的拦截器 Interceptor
 		if (specificInterceptors != null) {
 			if (specificInterceptors.length > 0) {
 				// specificInterceptors may equal PROXY_WITHOUT_ADDITIONAL_INTERCEPTORS
-				// 加入拦截器
+				// 加入特定的拦截器
 				allInterceptors.addAll(Arrays.asList(specificInterceptors));
 			}
 			if (commonInterceptors.length > 0) {
@@ -569,7 +570,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 
 		Advisor[] advisors = new Advisor[allInterceptors.size()];
 		for (int i = 0; i < allInterceptors.size(); i++) {
-			//封装拦截器并转化为Advisor
+			//封装所有拦截器并转化为 Advisor
 			advisors[i] = this.advisorAdapterRegistry.wrap(allInterceptors.get(i));
 		}
 		return advisors;

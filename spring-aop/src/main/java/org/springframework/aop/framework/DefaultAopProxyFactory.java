@@ -57,13 +57,13 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 	@Override
 	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
 		if (!NativeDetector.inNativeImage() &&
-				//1. Optimize：用来控制通过 CGLIB 创建的代理是否使用激进的优化策略。除非完全了解
-				//AOP 代理如何处理优化，否则不推荐用户使用这个设置。目前这个属性仅用于CGLIB
-				//代理，对于JDK动态代理（默认代理）无效
+				// Optimize：用来控制通过 CGLIB 创建的代理是否使用激进的优化策略。除非完全了解
+				// AOP 代理如何处理优化，否则不推荐用户使用这个设置。目前这个属性仅用于CGLIB
+				// 代理，对于JDK动态代理（默认代理）无效
 				(config.isOptimize() ||
-						//2.是否强制使用Cglib代理
+						// 1.是否使用Cglib代理
 						config.isProxyTargetClass() ||
-						//3.是否存在代理接口
+						// 2.是否存在代理接口
 						hasNoUserSuppliedProxyInterfaces(config))) {
 			Class<?> targetClass = config.getTargetClass();
 			if (targetClass == null) {

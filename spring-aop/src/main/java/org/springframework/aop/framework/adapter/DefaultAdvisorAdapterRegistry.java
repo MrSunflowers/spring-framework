@@ -62,7 +62,7 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 		if (adviceObject instanceof Advisor) {
 			return (Advisor) adviceObject;
 		}
-		// 因为此封装方法只对 Advisor 与 Advice 两种类型的数据有效，如果不是将不能封装处理
+		// 此封装方法只对 Advisor 与 Advice 两种类型的数据有效，如果不是将不能封装处理
 		if (!(adviceObject instanceof Advice)) {
 			throw new UnknownAdviceTypeException(adviceObject);
 		}
