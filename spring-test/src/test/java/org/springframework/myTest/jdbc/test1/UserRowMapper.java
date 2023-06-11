@@ -1,4 +1,4 @@
-package org.springframework.myTest.jdbc;
+package org.springframework.myTest.jdbc.test1;
 
 import org.springframework.jdbc.core.RowMapper;
 
