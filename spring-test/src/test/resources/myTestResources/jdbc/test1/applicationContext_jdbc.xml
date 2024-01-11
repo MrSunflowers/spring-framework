@@ -3,23 +3,19 @@
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
 		<!--驱动类名 -->
-		<property name="driverClass" value="oracle.jdbc.driver.OracleDriver" />
+		<property name="driverClassName" value="com.mysql.cj.jdbc.Driver" />
 		<!-- url -->
-		<property name="jdbcUrl" value="jdbc:oracle:thin:@127.0.0.1:1521:ORCL" />
+		<property name="url" value="jdbc:mysql://192.168.1.100:3306/spring_test" />
 		<!-- 用户名 -->
-		<property name="user" value="scott" />
+		<property name="username" value="root" />
 		<!-- 密码 -->
-		<property name="password" value="admin" />
-		<!-- 当连接池中的连接耗尽的时候c3p0一次同时获取的连接数  -->
-		<property name="acquireIncrement" value="5" />
+		<property name="password" value="root" />
 		<!-- 初始连接池大小 -->
-		<property name="initialPoolSize" value="10" />
-		<!-- 连接池中连接最小个数 -->
-		<property name="minPoolSize" value="5" />
+		<property name="initialSize" value="10" />
 		<!-- 连接池中连接最大个数 -->
-		<property name="maxPoolSize" value="20" />
+		<property name="maxActive" value="20" />
 	</bean>
 
 </beans>

@@ -77,6 +77,7 @@ dependencies {
 	testRuntime("com.sun.xml.bind:jaxb-core")
 	testRuntime("com.sun.xml.bind:jaxb-impl")
 	implementation 'com.alibaba:druid:1.2.18'
+	implementation 'com.mysql:mysql-connector-j:8.0.33'
 }
 
 task junit(type: Test) {
